@@ -1,0 +1,12 @@
+suite_id: v1_smoke
+benchmark_version: v1
+tracks: [zero-shot]
+tasks: [pseudo, infectio, response, scenario]
+models: [qwen25_7b]
+runtime_default: mock
+parameters:
+  temperature: 0.0
+  top_p: 1.0
+  max_tokens: 256
+  seed: 7
+smoke_dataset: assets/smoke_sets/v1_smoke.jsonl

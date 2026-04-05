@@ -1,0 +1,155 @@
+=== EXEMPLE 1 ===
+Document ID: SCEN-FS-001
+Speciality metadata: PNEUMOLOGIE
+Texte clinique
+<<<BEGIN_TEXT>>>
+Patiente Marie Durand, 54 ans, admise par les urgences pour pneumonie. Sortie à domicile.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "SCEN-FS-001",
+  "task": "scenario",
+  "records": [
+    {
+      "label": "name",
+      "text": "Marie Durand",
+      "start": 9,
+      "end": 21,
+      "attributes": {}
+    },
+    {
+      "label": "age",
+      "text": "54 ans",
+      "start": 23,
+      "end": 29,
+      "attributes": {}
+    },
+    {
+      "label": "admission_mode",
+      "text": "urgences",
+      "start": 46,
+      "end": 54,
+      "attributes": {}
+    },
+    {
+      "label": "primary_diagnosis",
+      "text": "pneumonie",
+      "start": 60,
+      "end": 69,
+      "attributes": {}
+    },
+    {
+      "label": "discharge_mode",
+      "text": "domicile",
+      "start": 80,
+      "end": 88,
+      "attributes": {}
+    }
+  ],
+  "speciality": "PNEUMOLOGIE"
+}
+
+=== EXEMPLE 2 ===
+Document ID: SCEN-FS-002
+Speciality metadata: HEPATO-GASTRO-ENTERO
+Texte clinique
+<<<BEGIN_TEXT>>>
+Patient de sexe masculin, 67 ans, hospitalisation programmée pour coloscopie. Retour au domicile le jour même.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "SCEN-FS-002",
+  "task": "scenario",
+  "records": [
+    {
+      "label": "sex",
+      "text": "masculin",
+      "start": 16,
+      "end": 24,
+      "attributes": {}
+    },
+    {
+      "label": "age",
+      "text": "67 ans",
+      "start": 26,
+      "end": 32,
+      "attributes": {}
+    },
+    {
+      "label": "admission_mode",
+      "text": "programmée",
+      "start": 50,
+      "end": 60,
+      "attributes": {}
+    },
+    {
+      "label": "primary_procedure",
+      "text": "coloscopie",
+      "start": 66,
+      "end": 76,
+      "attributes": {}
+    },
+    {
+      "label": "discharge_mode",
+      "text": "domicile",
+      "start": 88,
+      "end": 96,
+      "attributes": {}
+    }
+  ],
+  "speciality": "HEPATO-GASTRO-ENTERO"
+}
+
+=== EXEMPLE 3 ===
+Document ID: SCEN-FS-003
+Speciality metadata: GYNECOLOGIE
+Texte clinique
+<<<BEGIN_TEXT>>>
+Mme Sophie Leroy, 33 ans, prise en charge en hôpital de jour pour biopsie mammaire. Sortie vers un autre établissement.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "SCEN-FS-003",
+  "task": "scenario",
+  "records": [
+    {
+      "label": "name",
+      "text": "Sophie Leroy",
+      "start": 4,
+      "end": 16,
+      "attributes": {}
+    },
+    {
+      "label": "age",
+      "text": "33 ans",
+      "start": 18,
+      "end": 24,
+      "attributes": {}
+    },
+    {
+      "label": "type_of_care",
+      "text": "hôpital de jour",
+      "start": 45,
+      "end": 60,
+      "attributes": {}
+    },
+    {
+      "label": "primary_procedure",
+      "text": "biopsie mammaire",
+      "start": 66,
+      "end": 82,
+      "attributes": {}
+    },
+    {
+      "label": "discharge_mode",
+      "text": "autre établissement",
+      "start": 99,
+      "end": 118,
+      "attributes": {}
+    }
+  ],
+  "speciality": "GYNECOLOGIE"
+}

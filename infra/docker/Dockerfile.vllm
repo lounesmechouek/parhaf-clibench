@@ -1,0 +1,26 @@
+FROM vllm/vllm-openai:v0.8.5
+
+WORKDIR /workspace
+COPY . /workspace
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    openssh-server \
+    rsync \
+    zstd \
+    curl \
+    ca-certificates \
+    && mkdir -p /run/sshd /root/.ssh \
+    && chmod 700 /root/.ssh \
+    && sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config \
+    && sed -ri 's/^#?PubkeyAuthentication .*/PubkeyAuthentication yes/' /etc/ssh/sshd_config \
+    && sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config \
+    && sed -ri 's/^#?ChallengeResponseAuthentication .*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config \
+    && (grep -q '^UsePAM no$' /etc/ssh/sshd_config || echo 'UsePAM no' >> /etc/ssh/sshd_config) \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir uv \
+    && uv sync
+
+EXPOSE 22
+EXPOSE 8000
+
+CMD ["/bin/bash", "-lc", "mkdir -p /run/sshd /root/.ssh && chmod 700 /root/.ssh && if [ -f /root/.ssh/authorized_keys ]; then chmod 600 /root/.ssh/authorized_keys; fi && /usr/sbin/sshd && /workspace/infra/docker/entrypoints/run_vllm_then_benchmark.sh"]

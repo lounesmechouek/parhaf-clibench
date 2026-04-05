@@ -1,0 +1,7 @@
+task_id: scenario
+dataset: HealthDataHub/PARHAF
+dataset_revision: 0a88093ff16168494fdb17aa40a040107171ed9d
+text_field: documents.text
+label_field: suggested_scenario
+official_metric: text_label_micro_f1
+required_record_fields: [label, text]

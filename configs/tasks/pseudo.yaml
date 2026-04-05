@@ -1,0 +1,7 @@
+task_id: pseudo
+dataset: HealthDataHub/PARHAF-pseudo-annotated
+dataset_revision: 4d866f075a4d91c4e5ce0058feedd6da1d8e879a
+text_field: full_text
+label_field: span_type
+official_metric: span_micro_f1
+required_record_fields: [label, text, start, end]

@@ -1,0 +1,5 @@
+runtime_id: vllm
+api_base: http://127.0.0.1:8000/v1
+healthcheck_url: http://127.0.0.1:8000/health
+chat_endpoint: /chat/completions
+timeout_seconds: 120

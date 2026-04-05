@@ -1,0 +1,6 @@
+model_id: aya_8b
+hf_id: CohereForAI/aya-expanse-8b
+revision: 5062468bf9bc0c6035fd64e06274333ec127d980
+tokenizer_revision: 5062468bf9bc0c6035fd64e06274333ec127d980
+family: llm
+max_context_tokens: 8192

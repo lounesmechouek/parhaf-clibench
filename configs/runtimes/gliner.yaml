@@ -1,0 +1,8 @@
+runtime_id: gliner
+engine: gliner2
+device: auto
+threshold: 0.5
+flat_ner: true
+multi_label: false
+batch_size: 8
+negation_window_chars: 48

@@ -1,0 +1,89 @@
+{
+  "pseudo": {
+    "dataset": "HealthDataHub/PARHAF-pseudo-annotated",
+    "revision": "4d866f075a4d91c4e5ce0058feedd6da1d8e879a",
+    "labels": [
+      "ADDRESS",
+      "CITY",
+      "COUNTRY",
+      "FAMILY_STATUS",
+      "FIRST_NAME",
+      "IDENTIFYING_DATE",
+      "LAST_NAME",
+      "PATIENT_BIRTHDATE",
+      "PATIENT_NATIONALITY",
+      "PATIENT_SOCIAL_IDENTITY",
+      "PHONE_NUMBER",
+      "UNIDENTIFYING_DATE",
+      "URL"
+    ],
+    "attribute_RolePER_values": [
+      "Carer",
+      "Other",
+      "Patient"
+    ]
+  },
+  "infectio": {
+    "dataset": "HealthDataHub/PARHAF-infectiology-annotated",
+    "revision": "452cfeeec0987b8088a6b9294f00dd4f735a5980",
+    "labels": [
+      "Bacterie",
+      "Bacteriemie",
+      "Infection",
+      "Site"
+    ],
+    "attribute_NEGATION_values": [
+      "Absent",
+      "Indetermine",
+      "Present"
+    ]
+  },
+  "response": {
+    "dataset": "HealthDataHub/PARHAF-response_to_treatment-annotated",
+    "revision": "a100ab2742614821898bc6880c0bff0c9a5bdccd",
+    "labels_union": [
+      "MaladieProgressive",
+      "MaladieStable",
+      "NonApplicable",
+      "NonDetermine",
+      "ReponseComplete",
+      "ReponsePartielle"
+    ]
+  },
+  "scenario": {
+    "dataset": "HealthDataHub/PARHAF",
+    "revision": "0a88093ff16168494fdb17aa40a040107171ed9d",
+    "specialities": [
+      "ANATOMOPATHOLOGIE",
+      "CANCERO ADULTE",
+      "CARDIOLOGIE",
+      "CHIR ORTHO ET TRAUMATO",
+      "CHIR.CARDIO-VASC.",
+      "CHIRURGIE VISCERALE",
+      "GYNECOLOGIE",
+      "HEMATOLOGIE CLINIQUE",
+      "HEPATO-GASTRO-ENTERO",
+      "MALADIES INFECTIEUSES",
+      "MEDECINE GERIATRIQUE",
+      "MEDECINE INTER-SPECIALITES",
+      "MEDECINE INTERNE",
+      "MEDECINE PEDIATRIQUE",
+      "NEPHROLOGIE",
+      "NEUROLOGIE",
+      "OBSTETRIQUE",
+      "PNEUMOLOGIE",
+      "REANIMATION",
+      "UROLOGIE"
+    ],
+    "suggested_scenario_fields": [
+      "admission_mode",
+      "age",
+      "discharge_mode",
+      "name",
+      "primary_diagnosis",
+      "primary_procedure",
+      "sex",
+      "type_of_care"
+    ]
+  }
+}

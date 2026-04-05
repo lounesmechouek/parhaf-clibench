@@ -1,0 +1,6 @@
+model_id: gliner2_multi
+hf_id: fastino/gliner2-multi-v1
+revision: 65627079a40a2b19a94eb4f08ebd00c429ccb6d4
+tokenizer_revision: 65627079a40a2b19a94eb4f08ebd00c429ccb6d4
+family: encoder
+max_context_tokens: 512

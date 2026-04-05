@@ -1,0 +1,8 @@
+task_id: infectio
+dataset: HealthDataHub/PARHAF-infectiology-annotated
+dataset_revision: 452cfeeec0987b8088a6b9294f00dd4f735a5980
+text_field: full_text
+label_field: attribute_LABEL
+attribute_fields: [attribute_NEGATION]
+official_metric: text_label_negation_micro_f1
+required_record_fields: [label, text]

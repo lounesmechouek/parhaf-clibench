@@ -1,0 +1,65 @@
+=== EXEMPLE 1 ===
+Document ID: RESP-FS-001
+Texte clinique
+<<<BEGIN_TEXT>>>
+Après trois cycles, diminution de 45 % de la taille tumorale : réponse partielle.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "RESP-FS-001",
+  "task": "response",
+  "records": [
+    {
+      "label": "ReponsePartielle",
+      "text": "diminution de 45 % de la taille tumorale",
+      "start": 20,
+      "end": 60,
+      "attributes": {}
+    }
+  ]
+}
+
+=== EXEMPLE 2 ===
+Document ID: RESP-FS-002
+Texte clinique
+<<<BEGIN_TEXT>>>
+Au dernier scanner, progression hépatique avec apparition de deux nouvelles lésions.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "RESP-FS-002",
+  "task": "response",
+  "records": [
+    {
+      "label": "MaladieProgressive",
+      "text": "progression hépatique avec apparition de deux nouvelles lésions",
+      "start": 20,
+      "end": 83,
+      "attributes": {}
+    }
+  ]
+}
+
+=== EXEMPLE 3 ===
+Document ID: RESP-FS-003
+Texte clinique
+<<<BEGIN_TEXT>>>
+Évaluation impossible à ce stade, absence d'imagerie de contrôle interprétable.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "RESP-FS-003",
+  "task": "response",
+  "records": [
+    {
+      "label": "NonDetermine",
+      "text": "absence d'imagerie de contrôle interprétable",
+      "start": 34,
+      "end": 78,
+      "attributes": {}
+    }
+  ]
+}

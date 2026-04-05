@@ -1,0 +1,161 @@
+=== EXEMPLE 1 ===
+Document ID: PSEUDO-FS-001
+Texte clinique
+<<<BEGIN_TEXT>>>
+Le patient M. Martin Paul, né le 14/05/1972, habite 12 rue des Lilas, 75015 Paris. Téléphone : 06 12 34 56 78.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "PSEUDO-FS-001",
+  "task": "pseudo",
+  "records": [
+    {
+      "label": "LAST_NAME",
+      "text": "Martin",
+      "start": 14,
+      "end": 20,
+      "attributes": {
+        "role": "Patient"
+      }
+    },
+    {
+      "label": "FIRST_NAME",
+      "text": "Paul",
+      "start": 21,
+      "end": 25,
+      "attributes": {
+        "role": "Patient"
+      }
+    },
+    {
+      "label": "PATIENT_BIRTHDATE",
+      "text": "14/05/1972",
+      "start": 33,
+      "end": 43,
+      "attributes": {}
+    },
+    {
+      "label": "ADDRESS",
+      "text": "12 rue des Lilas",
+      "start": 52,
+      "end": 68,
+      "attributes": {}
+    },
+    {
+      "label": "CITY",
+      "text": "Paris",
+      "start": 76,
+      "end": 81,
+      "attributes": {}
+    },
+    {
+      "label": "PHONE_NUMBER",
+      "text": "06 12 34 56 78",
+      "start": 95,
+      "end": 109,
+      "attributes": {}
+    }
+  ]
+}
+
+=== EXEMPLE 2 ===
+Document ID: PSEUDO-FS-002
+Texte clinique
+<<<BEGIN_TEXT>>>
+Courrier adressé au Dr Dupont Claire le 03/11/2024. Adresse du cabinet : 8 avenue Victor Hugo, Lyon.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "PSEUDO-FS-002",
+  "task": "pseudo",
+  "records": [
+    {
+      "label": "LAST_NAME",
+      "text": "Dupont",
+      "start": 23,
+      "end": 29,
+      "attributes": {
+        "role": "Carer"
+      }
+    },
+    {
+      "label": "FIRST_NAME",
+      "text": "Claire",
+      "start": 30,
+      "end": 36,
+      "attributes": {
+        "role": "Carer"
+      }
+    },
+    {
+      "label": "IDENTIFYING_DATE",
+      "text": "03/11/2024",
+      "start": 40,
+      "end": 50,
+      "attributes": {}
+    },
+    {
+      "label": "ADDRESS",
+      "text": "8 avenue Victor Hugo",
+      "start": 73,
+      "end": 93,
+      "attributes": {}
+    },
+    {
+      "label": "CITY",
+      "text": "Lyon",
+      "start": 95,
+      "end": 99,
+      "attributes": {}
+    }
+  ]
+}
+
+=== EXEMPLE 3 ===
+Document ID: PSEUDO-FS-003
+Texte clinique
+<<<BEGIN_TEXT>>>
+Compte rendu reçu de Mme Benali Sarah. Patiente domiciliée 21 boulevard Voltaire à Marseille.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "PSEUDO-FS-003",
+  "task": "pseudo",
+  "records": [
+    {
+      "label": "LAST_NAME",
+      "text": "Benali",
+      "start": 25,
+      "end": 31,
+      "attributes": {
+        "role": "Patient"
+      }
+    },
+    {
+      "label": "FIRST_NAME",
+      "text": "Sarah",
+      "start": 32,
+      "end": 37,
+      "attributes": {
+        "role": "Patient"
+      }
+    },
+    {
+      "label": "ADDRESS",
+      "text": "21 boulevard Voltaire",
+      "start": 59,
+      "end": 80,
+      "attributes": {}
+    },
+    {
+      "label": "CITY",
+      "text": "Marseille",
+      "start": 83,
+      "end": 92,
+      "attributes": {}
+    }
+  ]
+}

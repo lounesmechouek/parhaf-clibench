@@ -1,0 +1,7 @@
+task_id: response
+dataset: HealthDataHub/PARHAF-response_to_treatment-annotated
+dataset_revision: a100ab2742614821898bc6880c0bff0c9a5bdccd
+text_field: full_text
+label_field: attribute_Nomenclature
+official_metric: text_label_micro_f1
+required_record_fields: [label, text]

@@ -1,0 +1,6 @@
+model_id: lucie_7b
+hf_id: OpenLLM-France/Lucie-7B-Instruct-v1.1
+revision: 5242dfecd662b2637176df3caad15a9d0fec6c0f
+tokenizer_revision: 5242dfecd662b2637176df3caad15a9d0fec6c0f
+family: llm
+max_context_tokens: 4096

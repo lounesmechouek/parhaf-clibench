@@ -1,0 +1,134 @@
+=== EXEMPLE 1 ===
+Document ID: INF-FS-001
+Texte clinique
+<<<BEGIN_TEXT>>>
+Hémocultures positives à Staphylococcus aureus. Bactériémie confirmée. Pas de foyer pulmonaire.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "INF-FS-001",
+  "task": "infectio",
+  "records": [
+    {
+      "label": "Bacterie",
+      "text": "Staphylococcus aureus",
+      "start": 25,
+      "end": 46,
+      "attributes": {
+        "negation": "Present"
+      }
+    },
+    {
+      "label": "Bacteriemie",
+      "text": "Bactériémie",
+      "start": 48,
+      "end": 59,
+      "attributes": {
+        "negation": "Present"
+      }
+    },
+    {
+      "label": "Site",
+      "text": "foyer pulmonaire",
+      "start": 78,
+      "end": 94,
+      "attributes": {
+        "negation": "Absent"
+      }
+    }
+  ]
+}
+
+=== EXEMPLE 2 ===
+Document ID: INF-FS-002
+Texte clinique
+<<<BEGIN_TEXT>>>
+Suspicion d'infection urinaire, sans bactériémie documentée. Escherichia coli possible.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "INF-FS-002",
+  "task": "infectio",
+  "records": [
+    {
+      "label": "Infection",
+      "text": "infection urinaire",
+      "start": 12,
+      "end": 30,
+      "attributes": {
+        "negation": "Indetermine"
+      }
+    },
+    {
+      "label": "Bacteriemie",
+      "text": "bactériémie",
+      "start": 37,
+      "end": 48,
+      "attributes": {
+        "negation": "Absent"
+      }
+    },
+    {
+      "label": "Bacterie",
+      "text": "Escherichia coli",
+      "start": 61,
+      "end": 77,
+      "attributes": {
+        "negation": "Indetermine"
+      }
+    }
+  ]
+}
+
+=== EXEMPLE 3 ===
+Document ID: INF-FS-003
+Texte clinique
+<<<BEGIN_TEXT>>>
+Aucune infection du site opératoire. Présence d'une pneumonie nosocomiale à Pseudomonas aeruginosa.
+<<<END_TEXT>>>
+
+JSON attendu
+{
+  "document_id": "INF-FS-003",
+  "task": "infectio",
+  "records": [
+    {
+      "label": "Infection",
+      "text": "infection du site opératoire",
+      "start": 7,
+      "end": 35,
+      "attributes": {
+        "negation": "Absent"
+      }
+    },
+    {
+      "label": "Site",
+      "text": "site opératoire",
+      "start": 20,
+      "end": 35,
+      "attributes": {
+        "negation": "Absent"
+      }
+    },
+    {
+      "label": "Infection",
+      "text": "pneumonie nosocomiale",
+      "start": 52,
+      "end": 73,
+      "attributes": {
+        "negation": "Present"
+      }
+    },
+    {
+      "label": "Bacterie",
+      "text": "Pseudomonas aeruginosa",
+      "start": 76,
+      "end": 98,
+      "attributes": {
+        "negation": "Present"
+      }
+    }
+  ]
+}
