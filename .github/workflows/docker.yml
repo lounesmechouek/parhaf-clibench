@@ -18,8 +18,10 @@ jobs:
       image_ref: ${{ steps.image-meta.outputs.image_ref }}
       image_repo: ${{ steps.image-meta.outputs.image_repo }}
       immutable_tag: ${{ steps.image-meta.outputs.immutable_tag }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Resolve image metadata
         id: image-meta
@@ -28,26 +30,48 @@ jobs:
           DOCKER_IMAGE_REPO: ${{ vars.DOCKER_IMAGE_REPO }}
         run: |
           set -euo pipefail
-          if [ -n "${DOCKER_IMAGE_REPO}" ]; then
+
+          if [ -n "${DOCKER_IMAGE_REPO:-}" ]; then
             image_repo="${DOCKER_IMAGE_REPO}"
           else
-            if [ -z "${DOCKERHUB_USERNAME}" ]; then
+            if [ -z "${DOCKERHUB_USERNAME:-}" ]; then
               echo "Missing DOCKERHUB_USERNAME secret (or set vars.DOCKER_IMAGE_REPO)." >&2
               exit 1
             fi
             image_repo="${DOCKERHUB_USERNAME}/parhaf-clinbench-vllm"
           fi
+
           immutable_tag="sha-${GITHUB_SHA::12}"
           image_ref="${image_repo}:${immutable_tag}"
+
           {
             echo "image_repo=${image_repo}"
             echo "immutable_tag=${immutable_tag}"
             echo "image_ref=${image_ref}"
           } >> "${GITHUB_OUTPUT}"
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Validate Docker Hub credentials
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
 
-      - uses: docker/login-action@v3
+          if [ -z "${DOCKERHUB_USERNAME:-}" ]; then
+            echo "Missing required secret: DOCKERHUB_USERNAME" >&2
+            exit 1
+          fi
+
+          if [ -z "${DOCKERHUB_TOKEN:-}" ]; then
+            echo "Missing required secret: DOCKERHUB_TOKEN" >&2
+            exit 1
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -76,20 +100,38 @@ jobs:
   update-runpod-template:
     runs-on: ubuntu-latest
     needs: build-and-push
-    if: ${{ secrets.RUNPOD_API_KEY != '' && vars.RUNPOD_TEMPLATE_ID != '' }}
+    if: ${{ vars.RUNPOD_TEMPLATE_ID != '' }}
+    env:
+      RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+      RUNPOD_TEMPLATE_ID: ${{ vars.RUNPOD_TEMPLATE_ID }}
+      RUNPOD_API_BASE: ${{ vars.RUNPOD_API_BASE }}
+      IMAGE_REF: ${{ needs.build-and-push.outputs.image_ref }}
+
     steps:
-      - name: Update RunPod template image tag
-        env:
-          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
-          RUNPOD_TEMPLATE_ID: ${{ vars.RUNPOD_TEMPLATE_ID }}
-          RUNPOD_API_BASE: ${{ vars.RUNPOD_API_BASE }}
-          IMAGE_REF: ${{ needs.build-and-push.outputs.image_ref }}
+      - name: Validate RunPod settings
         run: |
           set -euo pipefail
+
+          if [ -z "${RUNPOD_TEMPLATE_ID:-}" ]; then
+            echo "Missing required variable: RUNPOD_TEMPLATE_ID" >&2
+            exit 1
+          fi
+
+          if [ -z "${RUNPOD_API_KEY:-}" ]; then
+            echo "RUNPOD_API_KEY is not set. Skipping RunPod template update."
+            exit 0
+          fi
+
+      - name: Update RunPod template image
+        run: |
+          set -euo pipefail
+
           api_base="${RUNPOD_API_BASE:-https://rest.runpod.io/v1}"
+
           templates_json="$(curl --fail --silent --show-error \
             --header "Authorization: Bearer ${RUNPOD_API_KEY}" \
             "${api_base}/templates")"
+
           payload="$(TEMPLATES_JSON="${templates_json}" python - <<'PY'
           import json
           import os
@@ -104,6 +146,7 @@ jobs:
               if str(item.get("id")) == template_id:
                   template = item
                   break
+
           if template is None:
               raise SystemExit(f"Template not found in /templates response: {template_id}")
 
@@ -111,6 +154,7 @@ jobs:
               "name": template["name"],
               "imageName": image_ref,
           }
+
           for key in (
               "containerDiskInGb",
               "containerRegistryAuthId",
@@ -130,11 +174,20 @@ jobs:
           sys.stdout.write(json.dumps(payload))
           PY
           )"
+
           curl --fail --silent --show-error \
-            --request POST \
-            --url "${api_base}/templates/${RUNPOD_TEMPLATE_ID}/update" \
+            --request PATCH \
+            --url "${api_base}/templates/${RUNPOD_TEMPLATE_ID}" \
             --header "Authorization: Bearer ${RUNPOD_API_KEY}" \
             --header "Content-Type: application/json" \
             --data "${payload}" > /tmp/runpod_template_update.json
+
           echo "Updated template ${RUNPOD_TEMPLATE_ID} -> ${IMAGE_REF}"
-          echo "response=$(cat /tmp/runpod_template_update.json)"
+
+      - name: RunPod summary
+        run: |
+          {
+            echo "### RunPod template updated"
+            echo "- Template ID: \`${RUNPOD_TEMPLATE_ID}\`"
+            echo "- Image: \`${IMAGE_REF}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
