@@ -95,5 +95,5 @@ def test_wait_pod_fails_fast_on_terminal_status(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(RunpodClient, "get_pod", lambda self, pod_id: next(statuses))
     monkeypatch.setattr("time.sleep", lambda seconds: None)
 
-    with pytest.raises(RuntimeError, match="statut terminal `FAILED`"):
+    with pytest.raises(RuntimeError, match="terminal status `FAILED`"):
         client.wait_pod(pod_id="pod_123", target_status="RUNNING", timeout_seconds=1800)

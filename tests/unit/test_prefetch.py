@@ -59,4 +59,4 @@ def test_prefetch_wraps_download_errors(tmp_path: Path, monkeypatch: pytest.Monk
     assert "snapshot_download" in message
     assert "Qwen/Qwen2.5-7B-Instruct" in message
     assert "revision=main" in message
-    assert "espace disque insuffisant" in message
+    assert "insufficient disk space" in message

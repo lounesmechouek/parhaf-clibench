@@ -7,7 +7,7 @@ from parhaf_clinbench.orchestration.runner import _empty_prediction
 
 
 def test_empty_prediction_requires_speciality_for_scenario() -> None:
-    with pytest.raises(ValueError, match="sans `speciality`"):
+    with pytest.raises(ValueError, match="without `speciality`"):
         _empty_prediction("doc-1", TaskId.SCENARIO, None)
 
 
