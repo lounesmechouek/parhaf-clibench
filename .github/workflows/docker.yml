@@ -198,13 +198,13 @@ jobs:
           payload = {
               "name": template["name"],
               "imageName": image_ref,
+              "dockerEntrypoint": [],
+              "dockerStartCmd": [],
           }
 
           for key in (
               "containerDiskInGb",
               "containerRegistryAuthId",
-              "dockerEntrypoint",
-              "dockerStartCmd",
               "env",
               "isPublic",
               "ports",

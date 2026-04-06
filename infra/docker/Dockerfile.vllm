@@ -28,4 +28,5 @@ RUN uv sync --frozen
 EXPOSE 22
 EXPOSE 8000
 
+ENTRYPOINT []
 CMD ["/bin/bash", "-lc", "mkdir -p /run/sshd /root/.ssh && chmod 700 /root/.ssh && if [ -f /root/.ssh/authorized_keys ]; then chmod 600 /root/.ssh/authorized_keys; fi && /usr/sbin/sshd && /workspace/infra/docker/entrypoints/run_vllm_then_benchmark.sh"]
