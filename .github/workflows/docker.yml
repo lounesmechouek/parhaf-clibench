@@ -25,22 +25,38 @@ jobs:
       - name: Free disk space before build
         run: |
           set -euo pipefail
-          echo "Disk usage before cleanup:"
+          echo "=== Disk usage BEFORE cleanup ==="
           df -h
           docker system df || true
 
-          # Keep this aggressive: vLLM base images are large and can fill runner disk quickly.
+          # ── Swap: repurpose the ~4 GB swap file as usable disk space ──────────
+          sudo swapoff -a || true
+          sudo rm -f /mnt/swapfile /swapfile || true
+
+          # ── Tool cache: Node, Python, Go, Ruby … (~8-10 GB) ──────────────────
+          # We never call setup-node/setup-python/etc. in this workflow.
+          sudo rm -rf /opt/hostedtoolcache || true
+
+          # ── Language runtimes we don't use (~6 GB) ───────────────────────────
           sudo rm -rf /usr/share/dotnet || true
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /opt/ghc || true
-          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
-          sudo rm -rf /usr/share/swift || true
           sudo rm -rf /usr/local/.ghcup || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/share/swift || true
+          sudo rm -rf /usr/local/lib/android || true
+
+          # ── Large pre-installed APT packages (~3-4 GB) ───────────────────────
+          sudo apt-get remove -y --purge \
+            '^dotnet-.*' '^llvm-.*' 'php.*' '^mongodb-.*' '^mysql-.*' \
+            google-chrome-stable firefox powershell \
+            2>/dev/null || true
+          sudo apt-get autoremove -y || true
           sudo apt-get clean || true
+
+          # ── Pre-pulled Docker images and build cache on the runner ───────────
           docker system prune --all --force || true
           docker builder prune --all --force || true
 
-          echo "Disk usage after cleanup:"
+          echo "=== Disk usage AFTER cleanup ==="
           df -h
           docker system df || true
 
