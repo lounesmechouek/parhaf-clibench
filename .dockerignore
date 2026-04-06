@@ -13,7 +13,7 @@ results/
 .env
 .vscode/
 .uv-cache/
-data/
+/data/
 
 # Docker build context hygiene
 .git/

@@ -13,4 +13,4 @@ results/
 .env
 .vscode/
 .uv-cache/
-data/
+/data/
