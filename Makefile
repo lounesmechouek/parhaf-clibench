@@ -26,7 +26,8 @@ precommit:
 	uv run pre-commit run --all-files --show-diff-on-failure
 
 gate:
-	uv run pre-commit run --all-files --show-diff-on-failure
+	uv run ruff check src tests
+	uv run mypy
 	uv run pytest
 
 smoke:
