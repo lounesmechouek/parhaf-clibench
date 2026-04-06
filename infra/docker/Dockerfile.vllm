@@ -1,7 +1,6 @@
 FROM vllm/vllm-openai:v0.8.5
 
 WORKDIR /workspace
-COPY . /workspace
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     openssh-server \
@@ -17,8 +16,14 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     && sed -ri 's/^#?ChallengeResponseAuthentication .*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config \
     && (grep -q '^UsePAM no$' /etc/ssh/sshd_config || echo 'UsePAM no' >> /etc/ssh/sshd_config) \
     && rm -rf /var/lib/apt/lists/* \
-    && pip install --no-cache-dir uv \
-    && uv sync
+    && pip install --no-cache-dir uv
+
+# Install Python deps first so code-only changes do not invalidate dependency layers.
+COPY pyproject.toml uv.lock README.md /workspace/
+RUN uv sync --frozen --no-install-project
+
+COPY . /workspace
+RUN uv sync --frozen
 
 EXPOSE 22
 EXPOSE 8000

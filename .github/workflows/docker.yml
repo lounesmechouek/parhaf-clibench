@@ -69,7 +69,8 @@ jobs:
             exit 1
           fi
 
-      - name: Free disk space before Docker build
+      - name: Free disk space before Docker build (optional)
+        if: ${{ vars.DOCKER_CLEANUP_BEFORE_BUILD == 'true' }}
         run: |
           set -euo pipefail
           docker system prune --all --force || true
@@ -105,6 +106,8 @@ jobs:
           tags: |
             ${{ steps.image-meta.outputs.image_ref }}
             ${{ steps.image-meta.outputs.image_repo }}:main
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Disk usage after build (on failure)
         if: failure()
@@ -124,10 +127,10 @@ jobs:
   update-runpod-template:
     runs-on: ubuntu-latest
     needs: build-and-push
-    if: ${{ vars.RUNPOD_TEMPLATE_ID != '' }}
+    if: ${{ secrets.RUNPOD_TEMPLATE_ID != '' || vars.RUNPOD_TEMPLATE_ID != '' }}
     env:
       RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
-      RUNPOD_TEMPLATE_ID: ${{ vars.RUNPOD_TEMPLATE_ID }}
+      RUNPOD_TEMPLATE_ID: ${{ secrets.RUNPOD_TEMPLATE_ID != '' && secrets.RUNPOD_TEMPLATE_ID || vars.RUNPOD_TEMPLATE_ID }}
       RUNPOD_API_BASE: ${{ vars.RUNPOD_API_BASE }}
       IMAGE_REF: ${{ needs.build-and-push.outputs.image_ref }}
 
