@@ -22,6 +22,28 @@ jobs:
       immutable_tag: ${{ steps.image-meta.outputs.immutable_tag }}
 
     steps:
+      - name: Free disk space before build
+        run: |
+          set -euo pipefail
+          echo "Disk usage before cleanup:"
+          df -h
+          docker system df || true
+
+          # Keep this aggressive: vLLM base images are large and can fill runner disk quickly.
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
+          sudo rm -rf /usr/share/swift || true
+          sudo rm -rf /usr/local/.ghcup || true
+          sudo apt-get clean || true
+          docker system prune --all --force || true
+          docker builder prune --all --force || true
+
+          echo "Disk usage after cleanup:"
+          df -h
+          docker system df || true
+
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -69,22 +91,6 @@ jobs:
             exit 1
           fi
 
-      - name: Free disk space before Docker build (optional)
-        if: ${{ vars.DOCKER_CLEANUP_BEFORE_BUILD == 'true' }}
-        run: |
-          set -euo pipefail
-          docker system prune --all --force || true
-          docker builder prune --all --force || true
-          sudo rm -rf /usr/share/dotnet || true
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /opt/ghc || true
-          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
-          sudo rm -rf /usr/share/swift || true
-          sudo rm -rf /usr/local/.ghcup || true
-          sudo apt-get clean || true
-          docker system df || true
-          df -h
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -107,7 +113,7 @@ jobs:
             ${{ steps.image-meta.outputs.image_ref }}
             ${{ steps.image-meta.outputs.image_repo }}:main
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       - name: Disk usage after build (on failure)
         if: failure()
