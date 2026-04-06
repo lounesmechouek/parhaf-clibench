@@ -80,5 +80,5 @@ def test_poll_runpod_requires_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     monkeypatch.setattr(sys, "argv", ["parhaf-poll-runpod"])
 
-    with pytest.raises(ValueError, match="RUNPOD_API_KEY est requis"):
+    with pytest.raises(ValueError, match="RUNPOD_API_KEY is required"):
         poll()

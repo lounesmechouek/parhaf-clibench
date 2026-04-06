@@ -84,7 +84,7 @@ def test_score_from_jsonl_fails_on_missing_document_id(tmp_path: Path) -> None:
         ],
     )
 
-    with pytest.raises(ValueError, match="non alignées par document_id"):
+    with pytest.raises(ValueError, match="not aligned by document_id"):
         score_from_jsonl(
             task=TaskId.PSEUDO,
             predictions_path=preds_path,

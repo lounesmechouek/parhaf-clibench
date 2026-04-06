@@ -27,7 +27,7 @@ def launch() -> None:
     args = parser.parse_args()
 
     if not args.pod_id:
-        raise ValueError("Pod ID requis (--pod-id ou RUNPOD_POD_ID).")
+        raise ValueError("Pod ID required (--pod-id or RUNPOD_POD_ID).")
 
     if not args.skip_gate:
         run_local_quality_gate()
@@ -51,7 +51,7 @@ def launch() -> None:
         return
 
     if settings.runpod_api_key is None:
-        raise ValueError("RUNPOD_API_KEY est requis pour lancer un pod.")
+        raise ValueError("RUNPOD_API_KEY is required to start a pod.")
 
     client = RunpodClient(api_base=settings.runpod_api_base, api_key=settings.runpod_api_key)
     current = client.get_pod(args.pod_id)

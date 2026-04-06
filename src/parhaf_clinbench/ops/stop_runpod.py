@@ -24,13 +24,13 @@ def stop_or_terminate() -> None:
     args = parser.parse_args()
 
     if not args.pod_id:
-        raise ValueError("Pod ID requis (--pod-id ou RUNPOD_POD_ID).")
+        raise ValueError("Pod ID required (--pod-id or RUNPOD_POD_ID).")
     if args.dry_run:
         action = "terminate" if args.terminate else "stop"
         print(json.dumps({"action": action, "pod_id": args.pod_id}, ensure_ascii=False, indent=2))
         return
     if settings.runpod_api_key is None:
-        raise ValueError("RUNPOD_API_KEY est requis.")
+        raise ValueError("RUNPOD_API_KEY is required.")
 
     client = RunpodClient(api_base=settings.runpod_api_base, api_key=settings.runpod_api_key)
     payload = client.terminate_pod(args.pod_id) if args.terminate else client.stop_pod(args.pod_id)

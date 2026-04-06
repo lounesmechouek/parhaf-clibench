@@ -25,9 +25,9 @@ def poll() -> None:
     args = parser.parse_args()
 
     if not args.pod_id:
-        raise ValueError("Pod ID requis (--pod-id ou RUNPOD_POD_ID).")
+        raise ValueError("Pod ID required (--pod-id or RUNPOD_POD_ID).")
     if settings.runpod_api_key is None:
-        raise ValueError("RUNPOD_API_KEY est requis.")
+        raise ValueError("RUNPOD_API_KEY is required.")
 
     client = RunpodClient(api_base=settings.runpod_api_base, api_key=settings.runpod_api_key)
     payload = client.wait_pod(

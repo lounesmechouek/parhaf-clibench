@@ -97,4 +97,4 @@ def test_dataset_prefetch_wraps_download_errors(
     assert "load_dataset" in message
     assert "HealthDataHub/PARHAF-pseudo-annotated" in message
     assert "revision=rev-123" in message
-    assert "Vérifie accès HF_TOKEN" in message
+    assert "Check HF_TOKEN access" in message

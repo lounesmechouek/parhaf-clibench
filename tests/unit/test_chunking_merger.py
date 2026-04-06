@@ -129,7 +129,7 @@ class TestMergeEdgeCases:
         assert merged.records == [r]
 
     def test_empty_chunks_list_raises(self) -> None:
-        with pytest.raises(ValueError, match="vide"):
+        with pytest.raises(ValueError, match="empty"):
             merge_canonical_documents([])
 
     def test_three_chunks_all_records_kept(self) -> None:

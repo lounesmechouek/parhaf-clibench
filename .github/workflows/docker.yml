@@ -112,8 +112,8 @@ jobs:
           tags: |
             ${{ steps.image-meta.outputs.image_ref }}
             ${{ steps.image-meta.outputs.image_repo }}:main
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ steps.image-meta.outputs.image_repo }}:buildcache
+          cache-to: type=registry,ref=${{ steps.image-meta.outputs.image_repo }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
 
       - name: Disk usage after build (on failure)
         if: failure()

@@ -69,5 +69,5 @@ def test_stop_runpod_requires_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     monkeypatch.setattr(sys, "argv", ["parhaf-stop-runpod"])
 
-    with pytest.raises(ValueError, match="RUNPOD_API_KEY est requis"):
+    with pytest.raises(ValueError, match="RUNPOD_API_KEY is required"):
         stop_or_terminate()

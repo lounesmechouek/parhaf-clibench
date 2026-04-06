@@ -256,12 +256,15 @@ class GlinerRuntime(RuntimeBackend):
 
         map_location = self._resolve_map_location()
         try:
-            self._model = GLiNER2.from_pretrained(
+            model = GLiNER2.from_pretrained(
                 self._model_reference,
                 local_files_only=True,
                 token=self._hf_token,
                 map_location=map_location,
-            ).to(map_location)
+            )
+            if hasattr(model, "to"):
+                model = model.to(map_location)
+            self._model = model
         except Exception as exc:
             raise RuntimeError(
                 "GLiNER2 failed to load from local cache. "

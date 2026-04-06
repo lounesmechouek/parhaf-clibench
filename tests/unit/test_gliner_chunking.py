@@ -190,5 +190,5 @@ class TestGlinerChunkingTriggered:
         # chunk 2 a un start_char > 0 → ses offsets doivent être > ceux du chunk 1
         starts = [r["start"] for r in records if r["label"] == "FIRST_NAME"]
         if starts:
-            # L'entité du chunk 2 doit avoir un offset absolu > son offset relatif (1)
-            assert starts[0] > 1, "L'offset du chunk 2 n'a pas été ajusté"
+            # The entity from chunk 2 must have an absolute offset > its relative offset (1)
+            assert starts[0] > 1, "Chunk 2 offset was not adjusted"

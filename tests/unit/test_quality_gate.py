@@ -44,5 +44,5 @@ def test_quality_gate_raises_when_one_command_fails(monkeypatch: pytest.MonkeyPa
 
     monkeypatch.setattr("parhaf_clinbench.ops.quality_gate.subprocess.run", fake_run)
 
-    with pytest.raises(RuntimeError, match="Gate locale échouée"):
+    with pytest.raises(RuntimeError, match="Local gate failed"):
         run_local_quality_gate()

@@ -204,7 +204,7 @@ class TestVllmChunkingTriggered:
         # (même si plusieurs chunks retournent le même offset absolu après ajustement)
         records = parsed["records"]
         keys = [(r["start"], r["end"], r["label"]) for r in records]
-        assert len(keys) == len(set(keys)), "Doublons non supprimés après merge"
+        assert len(keys) == len(set(keys)), "Duplicates not removed after merge"
 
     def test_empty_result_when_all_chunks_fail(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Si tous les chunks échouent au parse, retourne chaîne vide."""
