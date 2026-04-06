@@ -409,9 +409,9 @@ class GlinerRuntime(RuntimeBackend):
 
         if self._tokenizer is None:
             try:
-                from transformers import AutoTokenizer  # type: ignore[import-untyped]
+                from transformers import AutoTokenizer
 
-                self._tokenizer = AutoTokenizer.from_pretrained(
+                self._tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
                     self._model_reference,
                     revision=self._tokenizer_revision,
                     trust_remote_code=True,

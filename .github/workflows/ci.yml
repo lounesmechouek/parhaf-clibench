@@ -9,15 +9,17 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - name: Install uv
         run: pip install uv
       - name: Sync dependencies
-        run: uv sync --all-extras
+        run: uv sync --frozen --extra dev
       - name: Local gate
         run: make gate
       - name: Smoke run

@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import types
 from typing import Any
-
-import pytest
 
 from parhaf_clinbench.chunking.splitter import TextChunk, make_chunks
 

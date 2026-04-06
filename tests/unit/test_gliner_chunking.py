@@ -111,7 +111,7 @@ class TestGlinerChunkingTriggered:
         )
         monkeypatch.setattr(runtime, "_get_tokenizer", lambda: _FakeTokenizer())
 
-        original_infer_single = runtime._infer_single  # type: ignore[attr-defined]
+        original_infer_single = runtime._infer_single
 
         def patched_infer_single(req: InferenceRequest) -> str:
             call_texts.append(req.text)
@@ -138,11 +138,19 @@ class TestGlinerChunkingTriggered:
 
         def _make_gliner(entities_per_chunk: list[list[dict[str, Any]]]) -> Any:
             class _CountingModel:
-                def extract_entities(self, text: str, labels: dict, *, include_spans: bool, include_confidence: bool, threshold: float = 0.5) -> dict:
+                def extract_entities(
+                    self,
+                    text: str,
+                    labels: dict[str, str],
+                    *,
+                    include_spans: bool,
+                    include_confidence: bool,
+                    threshold: float = 0.5,
+                ) -> dict[str, dict[str, list[dict[str, Any]]]]:
                     idx = chunk_n[0]
                     chunk_n[0] += 1
                     ents = entities_per_chunk[idx] if idx < len(entities_per_chunk) else []
-                    grouped: dict[str, list[dict]] = {}
+                    grouped: dict[str, list[dict[str, Any]]] = {}
                     for item in ents:
                         lbl = str(item["label"])
                         grouped.setdefault(lbl, []).append({

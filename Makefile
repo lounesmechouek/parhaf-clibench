@@ -1,7 +1,11 @@
-.PHONY: install install-locale lint type test smoke run-example gate
+.PHONY: install install-hooks install-locale lint fmt type test precommit smoke run-example gate
 
 install:
 	uv sync --extra dev
+	uv run pre-commit install --install-hooks --hook-type pre-commit
+
+install-hooks:
+	uv run pre-commit install --install-hooks --hook-type pre-commit
 
 install-locale:
 	uv sync --extra dev --extra locale
@@ -18,9 +22,11 @@ type:
 test:
 	uv run pytest
 
+precommit:
+	uv run pre-commit run --all-files --show-diff-on-failure
+
 gate:
-	uv run ruff check src tests
-	uv run mypy
+	uv run pre-commit run --all-files --show-diff-on-failure
 	uv run pytest
 
 smoke:

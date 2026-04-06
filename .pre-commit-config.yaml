@@ -1,13 +1,17 @@
+minimum_pre_commit_version: "3.7.0"
+default_install_hook_types:
+  - pre-commit
+
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.0
+  - repo: local
     hooks:
       - id: ruff-check
-      - id: ruff-format
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
-    hooks:
+        name: ruff check
+        entry: uv run ruff check src tests
+        language: system
+        pass_filenames: false
       - id: mypy
-        additional_dependencies:
-          - types-PyYAML
-          - types-requests
+        name: mypy
+        entry: uv run mypy
+        language: system
+        pass_filenames: false
