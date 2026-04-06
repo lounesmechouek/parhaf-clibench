@@ -20,4 +20,4 @@ def run_local_quality_gate() -> None:
     for cmd in commands:
         result = subprocess.run(cmd, check=False)
         if result.returncode != 0:
-            raise RuntimeError(f"Gate locale échouée sur: {' '.join(cmd)}")
+            raise RuntimeError(f"Local gate failed on: {' '.join(cmd)}")

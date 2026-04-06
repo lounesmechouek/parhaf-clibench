@@ -32,7 +32,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="parhaf-clinbench")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    run_parser = sub.add_parser("run", help="Lancer une campagne benchmark")
+    run_parser = sub.add_parser("run", help="Run a benchmark campaign")
     run_parser.add_argument("--suite", default=settings.parhaf_suite)
     run_parser.add_argument(
         "--task",
@@ -47,11 +47,11 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--model", default="all")
     run_parser.add_argument("--output-dir", default=settings.parhaf_output_dir)
 
-    smoke_parser = sub.add_parser("smoke", help="Exécuter la suite smoke")
+    smoke_parser = sub.add_parser("smoke", help="Run the smoke suite")
     smoke_parser.add_argument("--suite", default="configs/suites/v1_smoke.yaml")
     smoke_parser.add_argument("--output-dir", default="results/smoke")
 
-    score_parser = sub.add_parser("score", help="Calculer un score offline")
+    score_parser = sub.add_parser("score", help="Compute offline scores")
     score_parser.add_argument("--predictions", required=True)
     score_parser.add_argument("--gold", required=True)
     score_parser.add_argument(
@@ -60,13 +60,13 @@ def _build_parser() -> argparse.ArgumentParser:
         required=True,
     )
 
-    report_parser = sub.add_parser("report", help="Afficher le chemin du rapport d'un run")
+    report_parser = sub.add_parser("report", help="Print the report path for a run")
     report_parser.add_argument("--run-dir", required=True)
 
-    prefetch_parser = sub.add_parser("prefetch", help="Précharger un modèle HF vers cache local")
+    prefetch_parser = sub.add_parser("prefetch", help="Prefetch a HF model into local cache")
     group = prefetch_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--model", help="Model ID configuré dans configs/models/*.yaml")
-    group.add_argument("--hf-id", help="Identifiant HF direct (ex: Qwen/Qwen2.5-7B-Instruct)")
+    group.add_argument("--model", help="Model ID from configs/models/*.yaml")
+    group.add_argument("--hf-id", help="Direct HF identifier (e.g. Qwen/Qwen2.5-7B-Instruct)")
     prefetch_parser.add_argument("--revision", default="main")
     prefetch_parser.add_argument("--cache-root", default=str(settings.model_cache_root))
     prefetch_parser.add_argument("--output-json", default="")
@@ -74,7 +74,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     prefetch_suite_parser = sub.add_parser(
         "prefetch-suite",
-        help="Précharger tous les modèles/datasets d'une suite",
+        help="Prefetch all models and datasets for a suite",
     )
     prefetch_suite_parser.add_argument("--suite", default=settings.parhaf_suite)
     prefetch_suite_parser.add_argument("--model-cache-root", default=str(settings.model_cache_root))
@@ -83,7 +83,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     audit_contracts_parser = sub.add_parser(
         "audit-contracts",
-        help="Auditer les contrats datasets (labels/attributs/champs) sur HF",
+        help="Audit dataset contracts (labels/attributes/fields) against HF",
     )
     audit_contracts_parser.add_argument("--suite", default=settings.parhaf_suite)
     audit_contracts_parser.add_argument(
@@ -94,7 +94,7 @@ def _build_parser() -> argparse.ArgumentParser:
     audit_contracts_parser.add_argument(
         "--allow-mismatch",
         action="store_true",
-        help="Retourne 0 même si des écarts de contrat sont détectés.",
+        help="Return 0 even when contract mismatches are detected.",
     )
 
     return parser
@@ -148,7 +148,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
     run_dir = Path(args.run_dir)
     report_path = run_dir / "report.md"
     if not report_path.exists():
-        raise FileNotFoundError(f"Rapport introuvable: {report_path}")
+        raise FileNotFoundError(f"Report not found: {report_path}")
     print(report_path)
     return 0
 
@@ -285,7 +285,7 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_prefetch_suite(args)
     if args.command == "audit-contracts":
         return _cmd_audit_contracts(args)
-    parser.error("Commande non supportée")
+    parser.error("unsupported command")
     return 2
 
 

@@ -64,16 +64,16 @@ def _build_prefetch_error_message(
     """Build a detailed prefetch error message."""
 
     details = [
-        f"Préchargement modèle impossible pendant `{phase}`.",
+        f"Model prefetch failed during `{phase}`.",
         f"hf_id={hf_id}",
         f"revision={revision}",
         f"target_dir={target_dir}",
-        f"détail={exc}",
+        f"detail={exc}",
     ]
     if isinstance(exc, OSError) and exc.errno == errno.ENOSPC:
-        details.append("Cause probable: espace disque insuffisant sur le volume.")
+        details.append("Likely cause: insufficient disk space on the volume.")
     else:
-        details.append("Vérifie accès HF_TOKEN, existence du repo/révision et permissions disque.")
+        details.append("Check HF_TOKEN access, repo/revision existence and disk permissions.")
     return " ".join(details)
 
 
@@ -141,7 +141,7 @@ def prefetch_hf_model(
         from huggingface_hub import snapshot_download
     except Exception as exc:  # pragma: no cover
         raise RuntimeError(
-            "Le package `huggingface_hub` est requis pour précharger les modèles."
+            "The `huggingface_hub` package is required to prefetch models."
         ) from exc
 
     try:

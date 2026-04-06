@@ -100,9 +100,17 @@ def _configure_run_logger(run_dir: Path) -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.propagate = False
     logger.handlers = []
-    handler = logging.FileHandler(log_dir / "run.log", encoding="utf-8")
-    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
-    logger.addHandler(handler)
+
+    fmt = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+
+    file_handler = logging.FileHandler(log_dir / "run.log", encoding="utf-8")
+    file_handler.setFormatter(fmt)
+    logger.addHandler(file_handler)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(fmt)
+    logger.addHandler(console_handler)
+
     return logger
 
 
@@ -117,7 +125,7 @@ def _empty_prediction(example_doc_id: str, task: TaskId, speciality: str | None)
 
     if task == TaskId.SCENARIO and speciality is None:
         raise ValueError(
-            "Impossible de générer une prédiction vide pour `scenario` sans `speciality`."
+            "Cannot generate an empty prediction for `scenario` without `speciality`."
         )
     return CanonicalDocument(
         document_id=example_doc_id,
@@ -217,7 +225,7 @@ def _build_runtime(
             max_context_tokens=max_context_tokens,
             tokenizer_revision=tokenizer_revision,
         )
-    raise ValueError(f"Runtime non supporté: {runtime_name}")
+    raise ValueError(f"Unsupported runtime: {runtime_name}")
 
 
 def _resolve_vllm_runtime_payload(payload: dict[str, Any]) -> dict[str, Any]:
@@ -277,10 +285,10 @@ def _tracks_for_runtime(
     if runtime_name != RuntimeName.GLINER:
         return list(selected_tracks)
     if track_selection == "fewshot":
-        raise ValueError("GLiNER supporte uniquement la track `zero-shot`.")
+        raise ValueError("GLiNER only supports the `zero-shot` track.")
     if TrackId.ZEROSHOT in selected_tracks:
         return [TrackId.ZEROSHOT]
-    raise ValueError("GLiNER requiert la track `zero-shot`.")
+    raise ValueError("GLiNER requires the `zero-shot` track.")
 
 
 def _wait_http_ready(url: str, timeout_seconds: int) -> None:
@@ -564,8 +572,8 @@ def run_campaign(
                 error=str(exc),
             )
             raise RuntimeError(
-                f"Échec préchargement modèle `{model_id}` ({model_cfg.hf_id}@{model_cfg.revision}). "
-                "Benchmark interrompu."
+                f"Model prefetch failed for `{model_id}` ({model_cfg.hf_id}@{model_cfg.revision}). "
+                "Benchmark aborted."
             ) from exc
         if prefetch_result is not None:
             _log_event(
@@ -663,9 +671,9 @@ def run_campaign(
                             error=str(exc),
                         )
                         raise RuntimeError(
-                            f"Échec préchargement dataset `{task_cfg.dataset}` "
-                            f"({task_cfg.dataset_revision}) pour tâche `{task.value}`. "
-                            "Benchmark interrompu."
+                            f"Dataset prefetch failed for `{task_cfg.dataset}` "
+                            f"({task_cfg.dataset_revision}) on task `{task.value}`. "
+                            "Benchmark aborted."
                         ) from exc
                     metadata.dataset_cache_hits[task.value] = dataset_prefetch.cache_hit
                     _log_event(
@@ -970,33 +978,33 @@ def score_from_jsonl(*, task: TaskId, predictions_path: Path, gold_path: Path) -
             document = dict_to_canonical_document(payload)
             if document.task != task:
                 raise ValueError(
-                    f"Tâche inattendue dans gold pour document `{document.document_id}`: "
-                    f"{document.task.value} (attendu: {task.value})"
+                    f"Unexpected task in gold for document `{document.document_id}`: "
+                    f"{document.task.value} (expected: {task.value})"
                 )
             if document.document_id in refs_by_doc_id:
-                raise ValueError(f"Document dupliqué dans gold: `{document.document_id}`")
+                raise ValueError(f"Duplicate document in gold: `{document.document_id}`")
             refs_by_doc_id[document.document_id] = document
 
     preds_by_doc_id: dict[str, CanonicalDocument] = {}
     for row in pred_rows:
         payload = row.get("parsed", row)
         if not isinstance(payload, dict):
-            raise ValueError("Chaque ligne de prédiction doit contenir un objet JSON")
+            raise ValueError("Each prediction line must contain a JSON object")
         document = dict_to_canonical_document(payload)
         if document.task != task:
             raise ValueError(
-                f"Tâche inattendue dans prédiction pour document `{document.document_id}`: "
-                f"{document.task.value} (attendu: {task.value})"
+                f"Unexpected task in prediction for document `{document.document_id}`: "
+                f"{document.task.value} (expected: {task.value})"
             )
         if document.document_id in preds_by_doc_id:
-            raise ValueError(f"Document dupliqué dans prédictions: `{document.document_id}`")
+            raise ValueError(f"Duplicate document in predictions: `{document.document_id}`")
         preds_by_doc_id[document.document_id] = document
 
     missing_predictions = sorted(set(refs_by_doc_id) - set(preds_by_doc_id))
     unexpected_predictions = sorted(set(preds_by_doc_id) - set(refs_by_doc_id))
     if missing_predictions or unexpected_predictions:
         raise ValueError(
-            "Prédictions/références non alignées par document_id. "
+            "Predictions/references not aligned by document_id. "
             f"missing={missing_predictions[:10]} unexpected={unexpected_predictions[:10]}"
         )
 

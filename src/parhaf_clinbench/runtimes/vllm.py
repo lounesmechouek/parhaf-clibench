@@ -199,8 +199,8 @@ class VllmRuntime(RuntimeBackend):
                 )
             except Exception as exc:
                 _LOG.warning(
-                    "Impossible de charger le tokenizer pour %s: %s. "
-                    "Fallback sur le comptage par mots (approximatif).",
+                    "Failed to load tokenizer for %s: %s. "
+                    "Falling back to word-count approximation.",
                     self._model_hf_id,
                     exc,
                 )
@@ -233,16 +233,16 @@ class VllmRuntime(RuntimeBackend):
         body = response.json()
         choices = body.get("choices", [])
         if not choices:
-            raise RuntimeError("Réponse vLLM sans choix de génération")
+            raise RuntimeError("vLLM response contains no generation choices")
         content = choices[0].get("message", {}).get("content", "")
         if not isinstance(content, str):
-            raise RuntimeError("Format de réponse vLLM inattendu")
+            raise RuntimeError("Unexpected vLLM response format")
         stripped = content.strip()
         if stripped.startswith("```"):
             # NOTE: Strict JSON schema output should never include markdown fences.
             _LOG.warning(
-                "vLLM response contient des backticks markdown malgré strict JSON schema "
-                "(model=%s, task=%s). Vérifier la conformité structured-outputs du modèle.",
+                "vLLM response contains markdown fences despite strict JSON schema "
+                "(model=%s, task=%s). Check the model's structured-output conformance.",
                 self._model_hf_id,
                 task.value,
             )
@@ -259,7 +259,7 @@ class VllmRuntime(RuntimeBackend):
         prompt_tokens = self._count_tokens(request.prompt)
         if prompt_tokens + effective_max_new >= _CHUNK_THRESHOLD * self._max_context_tokens:
             _LOG.info(
-                "Chunking activé: prompt=%d tokens + max_new=%d >= %.0f%% de %d "
+                "Chunking enabled: prompt=%d tokens + max_new=%d >= %.0f%% of %d "
                 "(document_id=%s, task=%s)",
                 prompt_tokens,
                 effective_max_new,
@@ -278,9 +278,9 @@ class VllmRuntime(RuntimeBackend):
         text_budget = int(_CHUNK_TARGET * self._max_context_tokens) - effective_max_new - overhead
         if text_budget <= 0:
             _LOG.warning(
-                "Budget texte négatif après soustraction overhead+max_new "
+                "Negative text budget after subtracting overhead+max_new "
                 "(overhead=%d, max_new=%d, max_context=%d). "
-                "Envoi du prompt complet sans chunking.",
+                "Sending full prompt without chunking.",
                 overhead,
                 effective_max_new,
                 self._max_context_tokens,
@@ -297,7 +297,7 @@ class VllmRuntime(RuntimeBackend):
                 chunk_results.append((doc, chunk.start_char))
             except Exception as exc:
                 _LOG.warning(
-                    "Chunk ignoré (parse error) pour document_id=%s: %s",
+                    "Chunk skipped (parse error) for document_id=%s: %s",
                     request.document_id,
                     exc,
                 )

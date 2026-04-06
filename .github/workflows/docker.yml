@@ -113,7 +113,7 @@ jobs:
             ${{ steps.image-meta.outputs.image_ref }}
             ${{ steps.image-meta.outputs.image_repo }}:main
           cache-from: type=gha
-          cache-to: type=gha,mode=min
+          cache-to: type=gha,mode=max
 
       - name: Disk usage after build (on failure)
         if: failure()

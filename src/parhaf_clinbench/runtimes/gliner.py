@@ -250,8 +250,8 @@ class GlinerRuntime(RuntimeBackend):
             from gliner2 import GLiNER2
         except Exception as exc:
             raise RuntimeError(
-                "Le package `gliner2` est requis pour le runtime GLiNER2. "
-                "Installe-le puis relance le benchmark."
+                "The `gliner2` package is required for the GLiNER2 runtime. "
+                "Install it and re-run the benchmark."
             ) from exc
 
         map_location = self._resolve_map_location()
@@ -261,12 +261,13 @@ class GlinerRuntime(RuntimeBackend):
                 local_files_only=True,
                 token=self._hf_token,
                 map_location=map_location,
-            )
+            ).to(map_location)
         except Exception as exc:
             raise RuntimeError(
-                "Chargement GLiNER2 impossible depuis le cache local. "
+                "GLiNER2 failed to load from local cache. "
                 f"model_reference={self._model_reference} device={map_location} detail={exc}"
             ) from exc
+        _LOG.info("GLiNER2 loaded on device=%s", map_location)
 
         self._library_version = str(getattr(gliner2_module, "__version__", "unknown"))
         return self._model
@@ -384,10 +385,10 @@ class GlinerRuntime(RuntimeBackend):
             )
 
         if not isinstance(raw, dict):
-            raise RuntimeError("Réponse GLiNER2 inattendue: objet JSON attendu.")
+            raise RuntimeError("Unexpected GLiNER2 response: expected a JSON object.")
         entities_node = raw.get("entities")
         if not isinstance(entities_node, dict):
-            raise RuntimeError("Réponse GLiNER2 inattendue: champ `entities` invalide.")
+            raise RuntimeError("Unexpected GLiNER2 response: invalid `entities` field.")
 
         flattened: list[dict[str, Any]] = []
         for raw_label, values in entities_node.items():
@@ -418,8 +419,8 @@ class GlinerRuntime(RuntimeBackend):
                 )
             except Exception as exc:
                 _LOG.warning(
-                    "Impossible de charger le tokenizer pour %s: %s. "
-                    "Fallback sur le comptage par mots (approximatif).",
+                    "Failed to load tokenizer for %s: %s. "
+                    "Falling back to word-count approximation.",
                     self._model_reference,
                     exc,
                 )
@@ -436,7 +437,7 @@ class GlinerRuntime(RuntimeBackend):
         text_tokens = self._count_tokens(request.text)
         if text_tokens >= _CHUNK_THRESHOLD * self._max_context_tokens:
             _LOG.info(
-                "Chunking activé: text=%d tokens >= %.0f%% de %d "
+                "Chunking enabled: text=%d tokens >= %.0f%% of %d "
                 "(document_id=%s, task=%s)",
                 text_tokens,
                 _CHUNK_THRESHOLD * 100,
@@ -480,7 +481,7 @@ class GlinerRuntime(RuntimeBackend):
                 chunk_results.append((doc, chunk.start_char))
             except Exception as exc:
                 _LOG.warning(
-                    "Chunk ignoré (parse error) pour document_id=%s: %s",
+                    "Chunk skipped (parse error) for document_id=%s: %s",
                     request.document_id,
                     exc,
                 )

@@ -200,12 +200,12 @@ def collect() -> None:
         "--ssh-port",
         type=int,
         default=None,
-        help="Port SSH exposé (requis pour RunPod en mode TCP direct).",
+        help="Exposed SSH port (required for RunPod in TCP direct mode).",
     )
     parser.add_argument(
         "--identity-file",
         default="",
-        help="Chemin vers la clé privée SSH (ex: ~/.ssh/id_ed25519).",
+        help="Path to SSH private key (e.g. ~/.ssh/id_ed25519).",
     )
     parser.add_argument("--remote-path", default=str(settings.final_archive_path))
     parser.add_argument("--local-dir", default="results/downloads")
@@ -219,7 +219,7 @@ def collect() -> None:
         "--transport",
         choices=["auto", "rsync", "ssh-cat", "ssh-pty-base64"],
         default="auto",
-        help="Méthode de transfert. `auto` adapte la stratégie selon la cible SSH.",
+        help="Transfer method. `auto` picks strategy based on the SSH target.",
     )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
@@ -268,7 +268,7 @@ def collect() -> None:
     for attempt in range(1, args.retries + 1):
         for transport in plan:
             print(
-                f"[collect] tentative {attempt}/{args.retries} transport={transport}",
+                f"[collect] attempt {attempt}/{args.retries} transport={transport}",
                 file=sys.stderr,
                 flush=True,
             )
@@ -288,11 +288,11 @@ def collect() -> None:
                 if rsync_code == 0:
                     destination.unlink(missing_ok=True)
                     last_error = RuntimeError(
-                        f"Échec rsync tentative {attempt}/{args.retries}: fichier invalide/corrompu."
+                        f"rsync attempt {attempt}/{args.retries} failed: invalid/corrupted file."
                     )
                 else:
                     last_error = RuntimeError(
-                        f"Échec rsync tentative {attempt}/{args.retries} (code={rsync_code})"
+                        f"rsync attempt {attempt}/{args.retries} failed (code={rsync_code})"
                     )
                 print(f"[collect] {last_error}", file=sys.stderr, flush=True)
                 continue
@@ -312,11 +312,11 @@ def collect() -> None:
                 if ssh_cat_code == 0:
                     destination.unlink(missing_ok=True)
                     last_error = RuntimeError(
-                        f"Échec ssh-cat tentative {attempt}/{args.retries}: fichier invalide/corrompu."
+                        f"ssh-cat attempt {attempt}/{args.retries} failed: invalid/corrupted file."
                     )
                 else:
                     last_error = RuntimeError(
-                        f"Échec ssh-cat tentative {attempt}/{args.retries} (code={ssh_cat_code})"
+                        f"ssh-cat attempt {attempt}/{args.retries} failed (code={ssh_cat_code})"
                     )
                 print(f"[collect] {last_error}", file=sys.stderr, flush=True)
                 continue
@@ -336,20 +336,20 @@ def collect() -> None:
                 if ssh_b64_code == 0:
                     destination.unlink(missing_ok=True)
                     last_error = RuntimeError(
-                        f"Échec ssh-pty-base64 tentative {attempt}/{args.retries}: fichier invalide/corrompu."
+                        f"ssh-pty-base64 attempt {attempt}/{args.retries} failed: invalid/corrupted file."
                     )
                 else:
                     last_error = RuntimeError(
-                        f"Échec ssh-pty-base64 tentative {attempt}/{args.retries} (code={ssh_b64_code})"
+                        f"ssh-pty-base64 attempt {attempt}/{args.retries} failed (code={ssh_b64_code})"
                     )
                 print(f"[collect] {last_error}", file=sys.stderr, flush=True)
                 continue
 
         if last_error is None:
-            last_error = RuntimeError(f"Tentative {attempt}/{args.retries} échouée.")
+            last_error = RuntimeError(f"Attempt {attempt}/{args.retries} failed.")
         time.sleep(attempt)
 
-    raise RuntimeError("Impossible de récupérer les artefacts.") from last_error
+    raise RuntimeError("Failed to retrieve artifacts.") from last_error
 
 
 def main() -> None:

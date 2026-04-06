@@ -80,9 +80,9 @@ def launch() -> None:
         except Exception:
             pass
         raise RuntimeError(
-            "Échec start pod RunPod. "
+            "RunPod pod start failed. "
             f"pod_id={args.pod_id} status_before={current_status} status_after={after_status}. "
-            f"Détail API: {exc}"
+            f"API detail: {exc}"
         ) from exc
     print(json.dumps(response, ensure_ascii=False, indent=2))
 

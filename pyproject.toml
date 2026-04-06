@@ -30,6 +30,9 @@ dev = [
 locale = [
   "vllm>=0.8.5",
 ]
+monitoring = [
+  "rich>=13.0",
+]
 
 [project.scripts]
 parhaf-clinbench = "parhaf_clinbench.cli.main:main"

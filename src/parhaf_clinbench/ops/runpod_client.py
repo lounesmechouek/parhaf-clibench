@@ -60,7 +60,7 @@ class RunpodClient:
                 response.raise_for_status()
                 body = response.json()
                 if not isinstance(body, dict):
-                    raise RuntimeError(f"Réponse API inattendue pour {url}: {type(body)!r}")
+                    raise RuntimeError(f"Unexpected API response from {url}: {type(body)!r}")
                 return body
             except requests.HTTPError as exc:
                 err_response = exc.response
@@ -80,7 +80,7 @@ class RunpodClient:
             if attempt >= self.max_retries:
                 break
             time.sleep(self.backoff_seconds * attempt)
-        raise RuntimeError(f"Échec requête RunPod {method} {url}: {last_error}") from last_error
+        raise RuntimeError(f"RunPod request failed {method} {url}: {last_error}") from last_error
 
     def launch_pod(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Create a pod using `POST /pods`."""
@@ -113,7 +113,7 @@ class RunpodClient:
         pod_id: str,
         target_status: str = "RUNNING",
         timeout_seconds: int = 1800,
-        poll_interval_seconds: int = 10,
+        poll_interval_seconds: int = 3,
     ) -> dict[str, Any]:
         """Poll a pod until a target status or timeout is reached."""
 
@@ -127,8 +127,8 @@ class RunpodClient:
                 return pod
             if status in terminal_failure_statuses:
                 raise RuntimeError(
-                    f"Pod {pod_id} est dans un statut terminal `{status}` "
-                    f"(attendu `{target_status}`)."
+                    f"Pod {pod_id} reached terminal status `{status}` "
+                    f"(expected `{target_status}`)."
                 )
             if status == "EXITED" and target_status.upper() != "EXITED":
                 # NOTE: Benchmark completed before target window was reached.
@@ -136,6 +136,6 @@ class RunpodClient:
                 return pod
             if time.monotonic() - start > timeout_seconds:
                 raise TimeoutError(
-                    f"Timeout en attente pod {pod_id}: statut courant={status}, attendu={target_status}"
+                    f"Timeout waiting for pod {pod_id}: current_status={status}, expected={target_status}"
                 )
             time.sleep(poll_interval_seconds)

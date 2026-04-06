@@ -3103,6 +3103,9 @@ dev = [
 locale = [
     { name = "vllm" },
 ]
+monitoring = [
+    { name = "rich" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -3119,12 +3122,13 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "requests", specifier = ">=2.32" },
+    { name = "rich", marker = "extra == 'monitoring'", specifier = ">=13.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.12.20240917" },
     { name = "types-requests", marker = "extra == 'dev'", specifier = ">=2.32.0.20250328" },
     { name = "vllm", marker = "extra == 'locale'", specifier = ">=0.8.5" },
 ]
-provides-extras = ["dev", "locale"]
+provides-extras = ["dev", "locale", "monitoring"]
 
 [[package]]
 name = "partial-json-parser"

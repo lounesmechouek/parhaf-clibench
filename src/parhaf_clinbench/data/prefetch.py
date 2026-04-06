@@ -64,16 +64,16 @@ def _build_prefetch_error_message(
     """Build a detailed prefetch error message."""
 
     details = [
-        f"Préchargement dataset impossible pendant `{phase}`.",
+        f"Dataset prefetch failed during `{phase}`.",
         f"dataset={dataset_name}",
         f"revision={revision}",
         f"target_dir={target_dir}",
-        f"détail={exc}",
+        f"detail={exc}",
     ]
     if isinstance(exc, OSError) and exc.errno == errno.ENOSPC:
-        details.append("Cause probable: espace disque insuffisant sur le volume.")
+        details.append("Likely cause: insufficient disk space on the volume.")
     else:
-        details.append("Vérifie accès HF_TOKEN, existence du dataset/révision et permissions disque.")
+        details.append("Check HF_TOKEN access, dataset/revision existence and disk permissions.")
     return " ".join(details)
 
 
@@ -153,7 +153,7 @@ def prefetch_hf_dataset(
         )
     except Exception as exc:  # pragma: no cover
         raise RuntimeError(
-            "Le package `datasets` est requis pour précharger les datasets."
+            "The `datasets` package is required to prefetch datasets."
         ) from exc
 
     config_names = list(configs) if configs is not None else list(

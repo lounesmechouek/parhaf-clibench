@@ -20,11 +20,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 
 # Install Python deps first so code-only changes do not invalidate dependency layers.
 COPY pyproject.toml uv.lock README.md /workspace/
-RUN uv sync --frozen --no-install-project
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project
 
 COPY . /workspace
-RUN chmod +x /workspace/infra/docker/entrypoints/run_vllm_then_benchmark.sh
-RUN uv sync --frozen
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
 
 EXPOSE 22
 EXPOSE 8000

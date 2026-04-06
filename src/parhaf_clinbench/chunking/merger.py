@@ -25,7 +25,7 @@ def merge_canonical_documents(
         True
     """
     if not chunks:
-        raise ValueError("La liste de chunks ne peut pas être vide")
+        raise ValueError("chunks list cannot be empty")
 
     first_doc = chunks[0][0]
     seen: dict[tuple[int | None, int | None, str, str], None] = {}

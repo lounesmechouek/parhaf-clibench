@@ -88,15 +88,15 @@ class Record(BenchModel):
     def _label_not_empty(cls, value: str) -> str:
         cleaned = value.strip()
         if not cleaned:
-            raise ValueError("label ne peut pas être vide")
+            raise ValueError("label cannot be empty")
         return cleaned
 
     @model_validator(mode="after")
     def _validate_span_bounds(self) -> Record:
         if (self.start is None) ^ (self.end is None):
-            raise ValueError("start et end doivent être fournis ensemble")
+            raise ValueError("start and end must be provided together")
         if self.start is not None and self.end is not None and self.end < self.start:
-            raise ValueError("end doit être >= start")
+            raise ValueError("end must be >= start")
         return self
 
 
@@ -118,7 +118,7 @@ class CanonicalDocument(BenchModel):
     def _document_id_not_empty(cls, value: str) -> str:
         cleaned = value.strip()
         if not cleaned:
-            raise ValueError("document_id ne peut pas être vide")
+            raise ValueError("document_id cannot be empty")
         return cleaned
 
     @model_validator(mode="after")
@@ -128,40 +128,40 @@ class CanonicalDocument(BenchModel):
                 if record.label not in PSEUDO_LABELS:
                     raise ValueError(f"Label pseudo invalide: {record.label}")
                 if record.text is None:
-                    raise ValueError("En tâche pseudo, text est requis pour chaque record")
+                    raise ValueError("pseudo task: text is required for each record")
                 if record.start is None or record.end is None:
-                    raise ValueError("En tâche pseudo, start/end sont requis pour chaque record")
+                    raise ValueError("pseudo task: start/end are required for each record")
                 unknown_keys = set(record.attributes) - {"role"}
                 if unknown_keys:
                     raise ValueError(
-                        f"Attribut(s) pseudo non supporté(s): {sorted(unknown_keys)}"
+                        f"unsupported pseudo attribute(s): {sorted(unknown_keys)}"
                     )
 
         if self.task == TaskId.INFECTIO:
             for record in self.records:
                 if record.label not in INFECTIO_LABELS:
-                    raise ValueError(f"Label infectio invalide: {record.label}")
+                    raise ValueError(f"invalid infectio label: {record.label}")
                 if record.text is None:
-                    raise ValueError("En tâche infectio, text est requis")
+                    raise ValueError("infectio task: text is required")
                 unknown_keys = set(record.attributes) - {"negation"}
                 if unknown_keys:
                     raise ValueError(
-                        f"Attribut(s) infectio non supporté(s): {sorted(unknown_keys)}"
+                        f"unsupported infectio attribute(s): {sorted(unknown_keys)}"
                     )
                 negation = record.attributes.get("negation")
                 if negation is not None and str(negation) not in INFECTIO_NEGATIONS:
-                    raise ValueError(f"Valeur negation invalide: {negation}")
+                    raise ValueError(f"invalid negation value: {negation}")
 
         if self.task == TaskId.RESPONSE:
             for record in self.records:
                 if record.label not in RESPONSE_LABELS:
-                    raise ValueError(f"Label response invalide: {record.label}")
+                    raise ValueError(f"invalid response label: {record.label}")
                 if record.text is None:
-                    raise ValueError("En tâche response, text est requis")
+                    raise ValueError("response task: text is required")
 
         if self.task == TaskId.SCENARIO:
             if self.speciality is None:
-                raise ValueError("En tâche scenario, speciality est requise")
+                raise ValueError("scenario task: speciality is required")
             if self.speciality not in SCENARIO_SPECIALITIES:
                 raise ValueError(f"Speciality scenario invalide: {self.speciality}")
             for record in self.records:
