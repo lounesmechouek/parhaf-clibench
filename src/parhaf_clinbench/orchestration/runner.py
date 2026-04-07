@@ -314,6 +314,7 @@ def _managed_vllm_server(
     runtime_payload: dict[str, Any],
     logger: logging.Logger,
     log_path: Path,
+    max_model_len: int | None = None,
 ) -> Any:
     """Start and stop a managed local vLLM server for a model."""
 
@@ -322,17 +323,21 @@ def _managed_vllm_server(
     timeout_seconds = int(runtime_payload.get("startup_timeout_seconds", 180))
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
+    cmd = [
+        "vllm",
+        "serve",
+        model_reference,
+        "--host",
+        str(get_settings().vllm_host),
+        "--port",
+        str(get_settings().vllm_port),
+    ]
+    if max_model_len is not None:
+        cmd += ["--max-model-len", str(max_model_len)]
+
     with log_path.open("w", encoding="utf-8") as handle:
         process = subprocess.Popen(
-            [
-                "vllm",
-                "serve",
-                model_reference,
-                "--host",
-                str(get_settings().vllm_host),
-                "--port",
-                str(get_settings().vllm_port),
-            ],
+            cmd,
             stdout=handle,
             stderr=subprocess.STDOUT,
             preexec_fn=os.setsid,
@@ -591,6 +596,7 @@ def run_campaign(
                 runtime_payload=runtime_payload,
                 logger=logger,
                 log_path=run_dir / "logs" / "vllm_server.log",
+                max_model_len=model_cfg.max_context_tokens,
             )
 
         with server_context:
@@ -601,6 +607,8 @@ def run_campaign(
                 model_reference,
                 runtime_payload,
                 hf_token=settings.hf_token,
+                tokenizer_revision=model_cfg.tokenizer_revision,
+                max_context_tokens=model_cfg.max_context_tokens,
             )
 
             metadata = RunMetadata.start(

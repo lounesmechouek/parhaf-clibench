@@ -74,11 +74,15 @@ def test_non_json_output_degrades_robustness_without_retry(
         runtime_payload: dict[str, Any],
         *,
         hf_token: str | None,
+        tokenizer_revision: str = "main",
+        max_context_tokens: int = 131072,
     ) -> _FakeRuntime:
         del runtime_name
         del model_reference
         del runtime_payload
         del hf_token
+        del tokenizer_revision
+        del max_context_tokens
         return runtime
 
     monkeypatch.setattr(runner_module, "_build_runtime", fake_build_runtime)
@@ -114,11 +118,15 @@ def test_invalid_speciality_degrades_robustness_without_retry(
         runtime_payload: dict[str, Any],
         *,
         hf_token: str | None,
+        tokenizer_revision: str = "main",
+        max_context_tokens: int = 131072,
     ) -> _FakeRuntime:
         del runtime_name
         del model_reference
         del runtime_payload
         del hf_token
+        del tokenizer_revision
+        del max_context_tokens
         return runtime
 
     monkeypatch.setattr(runner_module, "_build_runtime", fake_build_runtime)

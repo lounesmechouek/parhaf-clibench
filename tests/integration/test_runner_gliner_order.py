@@ -64,10 +64,14 @@ def test_run_campaign_prioritizes_gliner_model_first(
         runtime_payload: dict[str, Any],
         *,
         hf_token: str | None,
+        tokenizer_revision: str = "main",
+        max_context_tokens: int = 131072,
     ) -> _FakeRuntime:
         del model_reference
         del runtime_payload
         del hf_token
+        del tokenizer_revision
+        del max_context_tokens
         return _FakeRuntime(runtime_name.value)
 
     def fake_resolve_model_reference(*, model_cfg: Any, runtime_name: Any) -> tuple[str, PrefetchResult]:
