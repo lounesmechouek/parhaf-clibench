@@ -291,11 +291,24 @@ def _tracks_for_runtime(
     raise ValueError("GLiNER requires the `zero-shot` track.")
 
 
-def _wait_http_ready(url: str, timeout_seconds: int) -> None:
-    """Wait until an HTTP URL responds with a 2xx status."""
+def _wait_http_ready(
+    url: str,
+    timeout_seconds: int,
+    process: subprocess.Popen[bytes] | None = None,
+) -> None:
+    """Wait until an HTTP URL responds with a 2xx status.
+
+    If `process` is provided, fails immediately when it exits unexpectedly
+    rather than waiting for the full timeout.
+    """
 
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
+        if process is not None and process.poll() is not None:
+            raise RuntimeError(
+                f"vLLM server exited unexpectedly (returncode={process.returncode}) "
+                f"before becoming ready. Check the vLLM server log for details."
+            )
         try:
             with urlopen(url, timeout=2) as response:
                 status = getattr(response, "status", 200)
@@ -304,7 +317,7 @@ def _wait_http_ready(url: str, timeout_seconds: int) -> None:
         except (URLError, TimeoutError, ValueError):
             pass
         time.sleep(1)
-    raise TimeoutError(f"Timeout healthcheck HTTP: {url}")
+    raise TimeoutError(f"vLLM server did not become ready within {timeout_seconds}s: {url}")
 
 
 @contextmanager
@@ -352,7 +365,7 @@ def _managed_vllm_server(
             log_path=str(log_path),
         )
         try:
-            _wait_http_ready(health_url, timeout_seconds=timeout_seconds)
+            _wait_http_ready(health_url, timeout_seconds=timeout_seconds, process=process)
             _log_event(logger, "vllm_server_ready", model_reference=model_reference)
             yield
         finally:
