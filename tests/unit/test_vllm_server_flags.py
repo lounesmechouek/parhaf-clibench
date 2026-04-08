@@ -91,21 +91,39 @@ def test_extra_flags_enable_chunked_prefill(tmp_path: Path, monkeypatch: pytest.
     assert "--enable-chunked-prefill" in cmd
 
 
+def test_extra_flags_guided_decoding_backend(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    payload = {**_base_payload(), "guided_decoding_backend": "xgrammar"}
+    cmd = _run_server(monkeypatch, tmp_path, payload)
+    assert "--guided-decoding-backend" in cmd
+    assert "xgrammar" in cmd
+
+
+def test_extra_flags_enable_prefix_caching(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    payload = {**_base_payload(), "enable_prefix_caching": True}
+    cmd = _run_server(monkeypatch, tmp_path, payload)
+    assert "--enable-prefix-caching" in cmd
+
+
 def test_extra_flags_all_together(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     payload = {
         **_base_payload(),
         "max_num_seqs": 128,
         "gpu_memory_utilization": 0.95,
+        "guided_decoding_backend": "xgrammar",
         "disable_log_requests": True,
         "enable_chunked_prefill": True,
+        "enable_prefix_caching": True,
     }
     cmd = _run_server(monkeypatch, tmp_path, payload)
     assert "--max-num-seqs" in cmd
     assert "128" in cmd
     assert "--gpu-memory-utilization" in cmd
     assert "0.95" in cmd
+    assert "--guided-decoding-backend" in cmd
+    assert "xgrammar" in cmd
     assert "--disable-log-requests" in cmd
     assert "--enable-chunked-prefill" in cmd
+    assert "--enable-prefix-caching" in cmd
 
 
 def test_false_flags_not_in_cmd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -114,10 +132,12 @@ def test_false_flags_not_in_cmd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
         **_base_payload(),
         "disable_log_requests": False,
         "enable_chunked_prefill": False,
+        "enable_prefix_caching": False,
     }
     cmd = _run_server(monkeypatch, tmp_path, payload)
     assert "--disable-log-requests" not in cmd
     assert "--enable-chunked-prefill" not in cmd
+    assert "--enable-prefix-caching" not in cmd
 
 
 def test_absent_flags_not_in_cmd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -125,8 +145,10 @@ def test_absent_flags_not_in_cmd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     cmd = _run_server(monkeypatch, tmp_path, _base_payload())
     assert "--max-num-seqs" not in cmd
     assert "--gpu-memory-utilization" not in cmd
+    assert "--guided-decoding-backend" not in cmd
     assert "--disable-log-requests" not in cmd
     assert "--enable-chunked-prefill" not in cmd
+    assert "--enable-prefix-caching" not in cmd
 
 
 def test_max_model_len_still_included(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

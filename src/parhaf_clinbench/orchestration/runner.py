@@ -372,8 +372,10 @@ def _managed_vllm_server(
     extra_flags: dict[str, Any] = {
         "--max-num-seqs": runtime_payload.get("max_num_seqs"),
         "--gpu-memory-utilization": runtime_payload.get("gpu_memory_utilization"),
+        "--guided-decoding-backend": runtime_payload.get("guided_decoding_backend"),
         "--disable-log-requests": runtime_payload.get("disable_log_requests", False),
         "--enable-chunked-prefill": runtime_payload.get("enable_chunked_prefill", False),
+        "--enable-prefix-caching": runtime_payload.get("enable_prefix_caching", False),
     }
     for flag, value in extra_flags.items():
         if value is True:
@@ -875,8 +877,49 @@ def run_campaign(
                         completed = 0
                         for future in as_completed(futures):
                             i = futures[future]
-                            results_by_index[i] = future.result()
+                            r = future.result()
+                            results_by_index[i] = r
                             completed += 1
+
+                            # Write JSONL immediately so the dashboard
+                            # can poll real-time progress from disk.
+                            with jsonl_lock:
+                                store.append_jsonl(
+                                    "timings.jsonl",
+                                    {
+                                        "document_id": r.document_id,
+                                        "task": task.value,
+                                        "track": track.value,
+                                        "latency_ms": r.latency_ms,
+                                        "input_tokens": r.input_tok,
+                                        "output_tokens": r.output_tok,
+                                    },
+                                )
+                                store.append_jsonl(
+                                    "predictions.jsonl",
+                                    {
+                                        "document_id": r.document_id,
+                                        "task": task.value,
+                                        "track": track.value,
+                                        "raw_output": r.raw_output,
+                                        "parsed": canonical_to_dict(r.final_doc),
+                                        "raw_json_valid": r.raw_json_valid,
+                                        "repair_applied": r.repair_applied,
+                                        "is_schema_valid": r.schema_valid,
+                                    },
+                                )
+                                if r.error is not None:
+                                    store.append_jsonl(
+                                        "errors.jsonl",
+                                        {
+                                            "document_id": r.document_id,
+                                            "task": task.value,
+                                            "track": track.value,
+                                            "error": r.error,
+                                            "raw_output": r.raw_output,
+                                        },
+                                    )
+
                             if completed % 100 == 0:
                                 _log_event(
                                     logger,
@@ -887,6 +930,7 @@ def run_campaign(
                                     total=len(examples),
                                 )
 
+                    # Reconstruct ordered lists for scoring (predictions[i] ↔ references[i]).
                     for i in range(len(examples)):
                         r = results_by_index[i]
                         outcome = PredictionOutcome(
@@ -905,43 +949,6 @@ def run_campaign(
                         output_tokens.append(r.output_tok)
                         predictions.append(r.final_doc)
                         references.append(examples[i].gold)
-
-                        with jsonl_lock:
-                            store.append_jsonl(
-                                "timings.jsonl",
-                                {
-                                    "document_id": r.document_id,
-                                    "task": task.value,
-                                    "track": track.value,
-                                    "latency_ms": r.latency_ms,
-                                    "input_tokens": r.input_tok,
-                                    "output_tokens": r.output_tok,
-                                },
-                            )
-                            store.append_jsonl(
-                                "predictions.jsonl",
-                                {
-                                    "document_id": r.document_id,
-                                    "task": task.value,
-                                    "track": track.value,
-                                    "raw_output": r.raw_output,
-                                    "parsed": canonical_to_dict(r.final_doc),
-                                    "raw_json_valid": r.raw_json_valid,
-                                    "repair_applied": r.repair_applied,
-                                    "is_schema_valid": r.schema_valid,
-                                },
-                            )
-                            if r.error is not None:
-                                store.append_jsonl(
-                                    "errors.jsonl",
-                                    {
-                                        "document_id": r.document_id,
-                                        "task": task.value,
-                                        "track": track.value,
-                                        "error": r.error,
-                                        "raw_output": r.raw_output,
-                                    },
-                                )
 
                     robustness = _robustness_metrics(outcomes, input_tokens, output_tokens)
                     scoring = _compute_task_metrics(task, predictions, references, robustness)

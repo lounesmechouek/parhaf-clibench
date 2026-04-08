@@ -4,8 +4,10 @@ healthcheck_url: http://127.0.0.1:8000/health
 chat_endpoint: /chat/completions
 timeout_seconds: 240
 startup_timeout_seconds: 1200
-max_workers: 8
-max_num_seqs: 64
+max_workers: 16
+max_num_seqs: 128
 gpu_memory_utilization: 0.92
+guided_decoding_backend: xgrammar
 disable_log_requests: true
 enable_chunked_prefill: true
+enable_prefix_caching: true
