@@ -2,5 +2,10 @@ runtime_id: vllm
 api_base: http://127.0.0.1:8000/v1
 healthcheck_url: http://127.0.0.1:8000/health
 chat_endpoint: /chat/completions
-timeout_seconds: 120
+timeout_seconds: 240
 startup_timeout_seconds: 1200
+max_workers: 8
+max_num_seqs: 64
+gpu_memory_utilization: 0.92
+disable_log_requests: true
+enable_chunked_prefill: true

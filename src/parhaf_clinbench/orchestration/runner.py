@@ -10,8 +10,11 @@ import platform
 import signal
 import statistics
 import subprocess
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager, nullcontext
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -72,6 +75,24 @@ from parhaf_clinbench.scoring.infectio import compute_infectio_metrics
 from parhaf_clinbench.scoring.pseudo import compute_pseudo_metrics
 from parhaf_clinbench.scoring.response import compute_response_metrics
 from parhaf_clinbench.scoring.scenario import compute_scenario_metrics
+
+
+@dataclass
+class _DocResult:
+    """Holds the per-document inference result from a worker thread."""
+
+    example_index: int
+    document_id: str
+    raw_output: str
+    parsed_doc: CanonicalDocument | None
+    raw_json_valid: bool
+    repair_applied: bool
+    schema_valid: bool
+    error: str | None
+    latency_ms: float
+    input_tok: int
+    output_tok: int
+    final_doc: CanonicalDocument
 
 
 def _pct95(values: list[float]) -> float:
@@ -245,7 +266,7 @@ def _apply_suite_generation_params_to_vllm_payload(
     """Inject suite generation parameters into vLLM runtime payload."""
 
     resolved = dict(payload)
-    for key in ("temperature", "top_p", "max_tokens", "seed"):
+    for key in ("temperature", "top_p", "max_tokens", "seed", "max_workers"):
         value = suite_parameters.get(key)
         if value is None:
             continue
@@ -347,6 +368,18 @@ def _managed_vllm_server(
     ]
     if max_model_len is not None:
         cmd += ["--max-model-len", str(max_model_len)]
+
+    extra_flags: dict[str, Any] = {
+        "--max-num-seqs": runtime_payload.get("max_num_seqs"),
+        "--gpu-memory-utilization": runtime_payload.get("gpu_memory_utilization"),
+        "--disable-log-requests": runtime_payload.get("disable_log_requests", False),
+        "--enable-chunked-prefill": runtime_payload.get("enable_chunked_prefill", False),
+    }
+    for flag, value in extra_flags.items():
+        if value is True:
+            cmd.append(flag)
+        elif value is not None and value is not False:
+            cmd += [flag, str(value)]
 
     with log_path.open("w", encoding="utf-8") as handle:
         process = subprocess.Popen(
@@ -602,6 +635,8 @@ def run_campaign(
                 local_path=prefetch_result.local_path,
                 cache_hit=prefetch_result.cache_hit,
             )
+        concurrency = int(runtime_payload.get("max_workers", 8))
+
         server_context: Any = nullcontext()
         if runtime_name == RuntimeName.VLLM:
             server_context = _managed_vllm_server(
@@ -751,7 +786,14 @@ def run_campaign(
                     input_tokens: list[int] = []
                     output_tokens: list[int] = []
 
-                    for example in examples:
+                    def _process_one(
+                        example_index: int,
+                        example: Any,
+                        task: TaskId = task,
+                        track: TrackId = track,
+                        fewshot_examples: str = fewshot_examples,
+                        runtime: MockRuntime | GlinerRuntime | VllmRuntime = runtime,
+                    ) -> _DocResult:
                         speciality_metadata = example.speciality if task == TaskId.SCENARIO else None
                         prompt = render_prompt(
                             task=task,
@@ -798,35 +840,6 @@ def run_campaign(
 
                         latency_ms = (time.perf_counter() - t0) * 1000.0
 
-                        outcome = PredictionOutcome(
-                            document_id=example.document_id,
-                            task=task,
-                            raw_output=raw_output,
-                            parsed=parsed_doc,
-                            raw_json_valid=raw_json_valid,
-                            repair_applied=repair_applied,
-                            is_schema_valid=schema_valid,
-                            error=error,
-                            latency_ms=latency_ms,
-                        )
-                        outcomes.append(outcome)
-
-                        input_tok = _token_count(prompt)
-                        output_tok = _token_count(raw_output)
-                        input_tokens.append(input_tok)
-                        output_tokens.append(output_tok)
-                        store.append_jsonl(
-                            "timings.jsonl",
-                            {
-                                "document_id": example.document_id,
-                                "task": task.value,
-                                "track": track.value,
-                                "latency_ms": latency_ms,
-                                "input_tokens": input_tok,
-                                "output_tokens": output_tok,
-                            },
-                        )
-
                         # NOTE: Fail-fast policy: no regeneration attempt.
                         # NOTE: Invalid outputs (JSON/schema/contract) become
                         # NOTE: empty predictions and count in robustness metrics.
@@ -835,33 +848,100 @@ def run_campaign(
                             if parsed_doc is not None and schema_valid
                             else _empty_prediction(example.document_id, task, example.speciality)
                         )
-                        predictions.append(final_doc)
-                        references.append(example.gold)
 
-                        store.append_jsonl(
-                            "predictions.jsonl",
-                            {
-                                "document_id": example.document_id,
-                                "task": task.value,
-                                "track": track.value,
-                                "raw_output": raw_output,
-                                "parsed": canonical_to_dict(final_doc),
-                                "raw_json_valid": raw_json_valid,
-                                "repair_applied": repair_applied,
-                                "is_schema_valid": schema_valid,
-                            },
+                        return _DocResult(
+                            example_index=example_index,
+                            document_id=example.document_id,
+                            raw_output=raw_output,
+                            parsed_doc=parsed_doc,
+                            raw_json_valid=raw_json_valid,
+                            repair_applied=repair_applied,
+                            schema_valid=schema_valid,
+                            error=error,
+                            latency_ms=latency_ms,
+                            input_tok=_token_count(prompt),
+                            output_tok=_token_count(raw_output),
+                            final_doc=final_doc,
                         )
-                        if error is not None:
+
+                    jsonl_lock = threading.Lock()
+                    results_by_index: dict[int, _DocResult] = {}
+
+                    with ThreadPoolExecutor(max_workers=concurrency) as pool:
+                        futures = {
+                            pool.submit(_process_one, i, ex): i
+                            for i, ex in enumerate(examples)
+                        }
+                        completed = 0
+                        for future in as_completed(futures):
+                            i = futures[future]
+                            results_by_index[i] = future.result()
+                            completed += 1
+                            if completed % 100 == 0:
+                                _log_event(
+                                    logger,
+                                    "inference_progress",
+                                    task=task.value,
+                                    track=track.value,
+                                    completed=completed,
+                                    total=len(examples),
+                                )
+
+                    for i in range(len(examples)):
+                        r = results_by_index[i]
+                        outcome = PredictionOutcome(
+                            document_id=r.document_id,
+                            task=task,
+                            raw_output=r.raw_output,
+                            parsed=r.parsed_doc,
+                            raw_json_valid=r.raw_json_valid,
+                            repair_applied=r.repair_applied,
+                            is_schema_valid=r.schema_valid,
+                            error=r.error,
+                            latency_ms=r.latency_ms,
+                        )
+                        outcomes.append(outcome)
+                        input_tokens.append(r.input_tok)
+                        output_tokens.append(r.output_tok)
+                        predictions.append(r.final_doc)
+                        references.append(examples[i].gold)
+
+                        with jsonl_lock:
                             store.append_jsonl(
-                                "errors.jsonl",
+                                "timings.jsonl",
                                 {
-                                    "document_id": example.document_id,
+                                    "document_id": r.document_id,
                                     "task": task.value,
                                     "track": track.value,
-                                    "error": error,
-                                    "raw_output": raw_output,
+                                    "latency_ms": r.latency_ms,
+                                    "input_tokens": r.input_tok,
+                                    "output_tokens": r.output_tok,
                                 },
                             )
+                            store.append_jsonl(
+                                "predictions.jsonl",
+                                {
+                                    "document_id": r.document_id,
+                                    "task": task.value,
+                                    "track": track.value,
+                                    "raw_output": r.raw_output,
+                                    "parsed": canonical_to_dict(r.final_doc),
+                                    "raw_json_valid": r.raw_json_valid,
+                                    "repair_applied": r.repair_applied,
+                                    "is_schema_valid": r.schema_valid,
+                                },
+                            )
+                            if r.error is not None:
+                                store.append_jsonl(
+                                    "errors.jsonl",
+                                    {
+                                        "document_id": r.document_id,
+                                        "task": task.value,
+                                        "track": track.value,
+                                        "error": r.error,
+                                        "raw_output": r.raw_output,
+                                    },
+                                )
 
                     robustness = _robustness_metrics(outcomes, input_tokens, output_tokens)
                     scoring = _compute_task_metrics(task, predictions, references, robustness)
