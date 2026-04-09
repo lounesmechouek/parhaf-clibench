@@ -3,11 +3,15 @@ benchmark_version: v1
 tracks: [zero-shot, few-shot]
 tasks: [pseudo, infectio, response, scenario]
 models:
+  - qwen25_7b
   - qwen35_9b
   - ministral_8b
   - aya_8b
   - llama31_8b
   - lucie_7b
+  - gliner2_multi
+runtime_overrides:
+  gliner2_multi: gliner
 runtime_default: vllm
 parameters:
   temperature: 0.0
