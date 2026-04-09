@@ -3,4 +3,4 @@ hf_id: mistralai/Ministral-8B-Instruct-2512
 revision: dcfc440ed367bc62945a537e9e31473406535292
 tokenizer_revision: dcfc440ed367bc62945a537e9e31473406535292
 family: llm
-max_context_tokens: 256000
+max_context_tokens: 32768

@@ -569,484 +569,491 @@ def run_campaign(
     produced_runs: list[Path] = []
 
     for model_index, model_id in enumerate(execution_models, start=1):
-        model_cfg = load_model(model_id)
-        runtime_name = suite.runtime_overrides.get(model_id, suite.runtime_default)
-        tracks = _tracks_for_runtime(
-            runtime_name=runtime_name,
-            selected_tracks=selected_tracks,
-            track_selection=track_selection,
-        )
-        runtime_cfg = load_runtime(runtime_name)
-        runtime_payload = dict(runtime_cfg.payload)
-        if runtime_name == RuntimeName.VLLM:
-            runtime_payload = _resolve_vllm_runtime_payload(runtime_payload)
-            runtime_payload = _apply_suite_generation_params_to_vllm_payload(
-                runtime_payload,
-                suite.parameters,
+        try:
+            model_cfg = load_model(model_id)
+            runtime_name = suite.runtime_overrides.get(model_id, suite.runtime_default)
+            tracks = _tracks_for_runtime(
+                runtime_name=runtime_name,
+                selected_tracks=selected_tracks,
+                track_selection=track_selection,
             )
+            runtime_cfg = load_runtime(runtime_name)
+            runtime_payload = dict(runtime_cfg.payload)
+            if runtime_name == RuntimeName.VLLM:
+                runtime_payload = _resolve_vllm_runtime_payload(runtime_payload)
+                runtime_payload = _apply_suite_generation_params_to_vllm_payload(
+                    runtime_payload,
+                    suite.parameters,
+                )
 
-        run_id = make_run_id(prefix=model_id)
-        run_dir = output_dir / run_id
-        store = ArtifactStore(run_dir)
-        logger = _configure_run_logger(run_dir)
-        produced_runs.append(run_dir)
+            run_id = make_run_id(prefix=model_id)
+            run_dir = output_dir / run_id
+            store = ArtifactStore(run_dir)
+            logger = _configure_run_logger(run_dir)
 
-        _log_event(
-            logger,
-            "run_started",
-            run_id=run_id,
-            model_id=model_id,
-            runtime=runtime_name.value,
-            execution_index=model_index,
-            execution_total=len(execution_models),
-            execution_order=execution_models,
-            tracks_requested=[track.value for track in selected_tracks],
-            tracks_resolved=[track.value for track in tracks],
-        )
-        if runtime_name == RuntimeName.GLINER and tracks != selected_tracks:
             _log_event(
                 logger,
-                "gliner_track_override",
+                "run_started",
+                run_id=run_id,
+                model_id=model_id,
+                runtime=runtime_name.value,
+                execution_index=model_index,
+                execution_total=len(execution_models),
+                execution_order=execution_models,
                 tracks_requested=[track.value for track in selected_tracks],
                 tracks_resolved=[track.value for track in tracks],
             )
-        try:
-            model_reference, prefetch_result = _resolve_model_reference(
-                model_cfg=model_cfg,
-                runtime_name=runtime_name,
-            )
-        except Exception as exc:
-            _log_event(
-                logger,
-                "model_prefetch_failed",
-                model_id=model_id,
-                hf_id=model_cfg.hf_id,
-                revision=model_cfg.revision,
-                error=str(exc),
-            )
-            raise RuntimeError(
-                f"Model prefetch failed for `{model_id}` ({model_cfg.hf_id}@{model_cfg.revision}). "
-                "Benchmark aborted."
-            ) from exc
-        if prefetch_result is not None:
-            _log_event(
-                logger,
-                "model_prefetch",
-                hf_id=prefetch_result.hf_id,
-                revision=prefetch_result.revision,
-                local_path=prefetch_result.local_path,
-                cache_hit=prefetch_result.cache_hit,
-            )
-        concurrency = int(runtime_payload.get("max_workers", 8))
+            if runtime_name == RuntimeName.GLINER and tracks != selected_tracks:
+                _log_event(
+                    logger,
+                    "gliner_track_override",
+                    tracks_requested=[track.value for track in selected_tracks],
+                    tracks_resolved=[track.value for track in tracks],
+                )
+            try:
+                model_reference, prefetch_result = _resolve_model_reference(
+                    model_cfg=model_cfg,
+                    runtime_name=runtime_name,
+                )
+            except Exception as exc:
+                _log_event(
+                    logger,
+                    "model_prefetch_failed",
+                    model_id=model_id,
+                    hf_id=model_cfg.hf_id,
+                    revision=model_cfg.revision,
+                    error=str(exc),
+                )
+                raise RuntimeError(
+                    f"Model prefetch failed for `{model_id}` ({model_cfg.hf_id}@{model_cfg.revision}). "
+                    "Benchmark aborted."
+                ) from exc
+            if prefetch_result is not None:
+                _log_event(
+                    logger,
+                    "model_prefetch",
+                    hf_id=prefetch_result.hf_id,
+                    revision=prefetch_result.revision,
+                    local_path=prefetch_result.local_path,
+                    cache_hit=prefetch_result.cache_hit,
+                )
+            concurrency = int(runtime_payload.get("max_workers", 8))
 
-        server_context: Any = nullcontext()
-        if runtime_name == RuntimeName.VLLM:
-            server_context = _managed_vllm_server(
-                model_reference=model_reference,
-                runtime_payload=runtime_payload,
-                logger=logger,
-                log_path=run_dir / "logs" / "vllm_server.log",
-                max_model_len=model_cfg.max_context_tokens,
-            )
+            server_context: Any = nullcontext()
+            if runtime_name == RuntimeName.VLLM:
+                server_context = _managed_vllm_server(
+                    model_reference=model_reference,
+                    runtime_payload=runtime_payload,
+                    logger=logger,
+                    log_path=run_dir / "logs" / "vllm_server.log",
+                    max_model_len=model_cfg.max_context_tokens,
+                )
 
-        with server_context:
-            resolved_runtime_cfg = RuntimeConfig(runtime_id=runtime_name, payload=runtime_payload)
-            run_healthcheck(runtime_name, resolved_runtime_cfg)
-            runtime = _build_runtime(
-                runtime_name,
-                model_reference,
-                runtime_payload,
-                hf_token=settings.hf_token,
-                tokenizer_revision=model_cfg.tokenizer_revision,
-                max_context_tokens=model_cfg.max_context_tokens,
-            )
+            with server_context:
+                resolved_runtime_cfg = RuntimeConfig(runtime_id=runtime_name, payload=runtime_payload)
+                run_healthcheck(runtime_name, resolved_runtime_cfg)
+                runtime = _build_runtime(
+                    runtime_name,
+                    model_reference,
+                    runtime_payload,
+                    hf_token=settings.hf_token,
+                    tokenizer_revision=model_cfg.tokenizer_revision,
+                    max_context_tokens=model_cfg.max_context_tokens,
+                )
 
-            metadata = RunMetadata.start(
-                run_id=run_id,
-                suite_id=suite.suite_id,
-                task_ids=[task.value for task in tasks],
-                track_ids=[track.value for track in tracks],
-                model_id=model_cfg.model_id,
-                model_hf_id=model_cfg.hf_id,
-                model_revision=model_cfg.revision,
-                tokenizer_revision=model_cfg.tokenizer_revision,
-                runtime_name=runtime.name,
-                runtime_version=runtime.version,
-            )
-            metadata.runtime_server_args = dict(runtime_payload)
-            metadata.structured_outputs_config = {
-                "response_format": {
-                    "type": "json_schema",
-                    "strict": True,
-                    "mode": "task_specific",
+                metadata = RunMetadata.start(
+                    run_id=run_id,
+                    suite_id=suite.suite_id,
+                    task_ids=[task.value for task in tasks],
+                    track_ids=[track.value for track in tracks],
+                    model_id=model_cfg.model_id,
+                    model_hf_id=model_cfg.hf_id,
+                    model_revision=model_cfg.revision,
+                    tokenizer_revision=model_cfg.tokenizer_revision,
+                    runtime_name=runtime.name,
+                    runtime_version=runtime.version,
+                )
+                metadata.runtime_server_args = dict(runtime_payload)
+                metadata.structured_outputs_config = {
+                    "response_format": {
+                        "type": "json_schema",
+                        "strict": True,
+                        "mode": "task_specific",
+                    }
                 }
-            }
-            metadata.image_digest = settings.parhaf_image_digest
-            metadata.runpod_pod_id = settings.runpod_pod_id
-            metadata.runpod_template_id = settings.runpod_template_id
-            metadata.gpu_name = settings.runpod_gpu_name
-            metadata.gpu_count = settings.runpod_gpu_count
-            metadata.vram_gb = settings.runpod_vram_gb
-            metadata.container_disk_gb = settings.runpod_container_disk_gb
-            metadata.volume_gb = settings.runpod_volume_gb
-            metadata.export_mode = settings.parhaf_export_mode
-            metadata.export_destination = settings.parhaf_export_destination
-            metadata.model_local_path = prefetch_result.local_path if prefetch_result is not None else None
-            metadata.no_download_needed = prefetch_result.cache_hit if prefetch_result is not None else None
-            metadata.model_execution_order = list(execution_models)
-            metadata.model_execution_index = model_index
-            metadata.model_execution_total = len(execution_models)
+                metadata.image_digest = settings.parhaf_image_digest
+                metadata.runpod_pod_id = settings.runpod_pod_id
+                metadata.runpod_template_id = settings.runpod_template_id
+                metadata.gpu_name = settings.runpod_gpu_name
+                metadata.gpu_count = settings.runpod_gpu_count
+                metadata.vram_gb = settings.runpod_vram_gb
+                metadata.container_disk_gb = settings.runpod_container_disk_gb
+                metadata.volume_gb = settings.runpod_volume_gb
+                metadata.export_mode = settings.parhaf_export_mode
+                metadata.export_destination = settings.parhaf_export_destination
+                metadata.model_local_path = prefetch_result.local_path if prefetch_result is not None else None
+                metadata.no_download_needed = prefetch_result.cache_hit if prefetch_result is not None else None
+                metadata.model_execution_order = list(execution_models)
+                metadata.model_execution_index = model_index
+                metadata.model_execution_total = len(execution_models)
 
-            track_reports: list[TrackReport] = []
-            store.write_text("predictions.jsonl", "")
-            store.write_text("errors.jsonl", "")
-            store.write_text("timings.jsonl", "")
-            prompt_snapshots: dict[str, dict[str, str]] = {}
+                track_reports: list[TrackReport] = []
+                store.write_text("predictions.jsonl", "")
+                store.write_text("errors.jsonl", "")
+                store.write_text("timings.jsonl", "")
+                prompt_snapshots: dict[str, dict[str, str]] = {}
 
-            task_examples: dict[TaskId, list[DocumentExample]] = {}
-            task_fingerprints: dict[TaskId, str] = {}
+                task_examples: dict[TaskId, list[DocumentExample]] = {}
+                task_fingerprints: dict[TaskId, str] = {}
 
-            for task in tasks:
-                task_cfg = load_task(task)
-                metadata.dataset_revisions[task.value] = task_cfg.dataset_revision
-                dataset_prefetch: DatasetPrefetchResult | None = None
-                if not suite.smoke_dataset:
-                    try:
-                        dataset_prefetch = prefetch_hf_dataset(
-                            dataset_name=task_cfg.dataset,
-                            revision=task_cfg.dataset_revision,
-                            cache_root=settings.dataset_cache_root,
-                            hf_token=settings.hf_token,
-                            configs=_dataset_prefetch_configs_for_task(task),
-                        )
-                    except Exception as exc:
+                for task in tasks:
+                    task_cfg = load_task(task)
+                    metadata.dataset_revisions[task.value] = task_cfg.dataset_revision
+                    dataset_prefetch: DatasetPrefetchResult | None = None
+                    if not suite.smoke_dataset:
+                        try:
+                            dataset_prefetch = prefetch_hf_dataset(
+                                dataset_name=task_cfg.dataset,
+                                revision=task_cfg.dataset_revision,
+                                cache_root=settings.dataset_cache_root,
+                                hf_token=settings.hf_token,
+                                configs=_dataset_prefetch_configs_for_task(task),
+                            )
+                        except Exception as exc:
+                            _log_event(
+                                logger,
+                                "dataset_prefetch_failed",
+                                task=task.value,
+                                dataset=task_cfg.dataset,
+                                revision=task_cfg.dataset_revision,
+                                error=str(exc),
+                            )
+                            raise RuntimeError(
+                                f"Dataset prefetch failed for `{task_cfg.dataset}` "
+                                f"({task_cfg.dataset_revision}) on task `{task.value}`. "
+                                "Benchmark aborted."
+                            ) from exc
+                        metadata.dataset_cache_hits[task.value] = dataset_prefetch.cache_hit
                         _log_event(
                             logger,
-                            "dataset_prefetch_failed",
+                            "dataset_prefetch",
                             task=task.value,
                             dataset=task_cfg.dataset,
                             revision=task_cfg.dataset_revision,
-                            error=str(exc),
+                            local_path=dataset_prefetch.local_path,
+                            cache_hit=dataset_prefetch.cache_hit,
                         )
-                        raise RuntimeError(
-                            f"Dataset prefetch failed for `{task_cfg.dataset}` "
-                            f"({task_cfg.dataset_revision}) on task `{task.value}`. "
-                            "Benchmark aborted."
-                        ) from exc
-                    metadata.dataset_cache_hits[task.value] = dataset_prefetch.cache_hit
-                    _log_event(
-                        logger,
-                        "dataset_prefetch",
-                        task=task.value,
-                        dataset=task_cfg.dataset,
-                        revision=task_cfg.dataset_revision,
-                        local_path=dataset_prefetch.local_path,
-                        cache_hit=dataset_prefetch.cache_hit,
+                    examples = _load_examples(task, task_cfg, suite)
+                    task_examples[task] = examples
+                    task_fingerprints[task] = examples_fingerprint(
+                        dataset_name=task_cfg.dataset,
+                        examples=examples,
                     )
-                examples = _load_examples(task, task_cfg, suite)
-                task_examples[task] = examples
-                task_fingerprints[task] = examples_fingerprint(
-                    dataset_name=task_cfg.dataset,
-                    examples=examples,
+
+                metadata.dataset_fingerprint = stable_sha256_text(
+                    "|".join(
+                        f"{task.value}:{task_fingerprints[task]}"
+                        for task in sorted(task_fingerprints, key=lambda value: value.value)
+                    )
                 )
 
-            metadata.dataset_fingerprint = stable_sha256_text(
-                "|".join(
-                    f"{task.value}:{task_fingerprints[task]}"
-                    for task in sorted(task_fingerprints, key=lambda value: value.value)
-                )
-            )
+                started = time.perf_counter()
+                for track in tracks:
+                    per_task_metrics: dict[str, TaskMetrics] = {}
+                    per_task_bootstrap: dict[str, BootstrapInterval] = {}
+                    per_task_doc_counts: dict[str, list[DocCounts]] = {}
 
-            started = time.perf_counter()
-            for track in tracks:
-                per_task_metrics: dict[str, TaskMetrics] = {}
-                per_task_bootstrap: dict[str, BootstrapInterval] = {}
-                per_task_doc_counts: dict[str, list[DocCounts]] = {}
-
-                for task in tasks:
-                    examples = task_examples[task]
-                    fewshot_examples = _load_fewshot(task) if track == TrackId.FEWSHOT else ""
-                    probe_speciality_metadata = "__SPECIALITY_METADATA__" if task == TaskId.SCENARIO else None
-                    probe_prompt = render_prompt(
-                        task=task,
-                        track=track,
-                        document_id="hash-probe",
-                        text="probe",
-                        fewshot_examples=fewshot_examples,
-                        speciality_metadata=probe_speciality_metadata,
-                    )
-                    prompt_hash = stable_sha256_text(probe_prompt)
-                    key = f"{task.value}:{track.value}"
-                    metadata.prompt_hashes[key] = prompt_hash
-                    prompt_snapshots[key] = {"hash": prompt_hash, "prompt": probe_prompt}
-                    if track == TrackId.FEWSHOT:
-                        metadata.fewshot_hash = stable_sha256_text(fewshot_examples)
-
-                    outcomes: list[PredictionOutcome] = []
-                    predictions: list[CanonicalDocument] = []
-                    references: list[CanonicalDocument] = []
-                    input_tokens: list[int] = []
-                    output_tokens: list[int] = []
-
-                    def _process_one(
-                        example_index: int,
-                        example: Any,
-                        task: TaskId = task,
-                        track: TrackId = track,
-                        fewshot_examples: str = fewshot_examples,
-                        runtime: MockRuntime | GlinerRuntime | VllmRuntime = runtime,
-                    ) -> _DocResult:
-                        speciality_metadata = example.speciality if task == TaskId.SCENARIO else None
-                        prompt = render_prompt(
+                    for task in tasks:
+                        examples = task_examples[task]
+                        fewshot_examples = _load_fewshot(task) if track == TrackId.FEWSHOT else ""
+                        probe_speciality_metadata = "__SPECIALITY_METADATA__" if task == TaskId.SCENARIO else None
+                        probe_prompt = render_prompt(
                             task=task,
                             track=track,
-                            document_id=example.document_id,
-                            text=example.text,
+                            document_id="hash-probe",
+                            text="probe",
                             fewshot_examples=fewshot_examples,
-                            speciality_metadata=speciality_metadata,
+                            speciality_metadata=probe_speciality_metadata,
                         )
-                        request = InferenceRequest(
-                            document_id=example.document_id,
-                            task=task,
-                            track=track,
-                            prompt=prompt,
-                            text=example.text,
-                            gold=example.gold,
-                        )
+                        prompt_hash = stable_sha256_text(probe_prompt)
+                        key = f"{task.value}:{track.value}"
+                        metadata.prompt_hashes[key] = prompt_hash
+                        prompt_snapshots[key] = {"hash": prompt_hash, "prompt": probe_prompt}
+                        if track == TrackId.FEWSHOT:
+                            metadata.fewshot_hash = stable_sha256_text(fewshot_examples)
 
-                        t0 = time.perf_counter()
-                        error: str | None = None
-                        try:
-                            raw_output = runtime.infer(request)
-                        except Exception as exc:
-                            raw_output = ""
-                            parsed_doc = None
-                            raw_json_valid = False
-                            repair_applied = False
-                            schema_valid = False
-                            error = f"Runtime error: {exc}"
-                        else:
-                            parsed_doc, raw_json_valid, repair_applied, schema_valid, error = validate_and_parse(
-                                raw_output,
-                                task,
+                        outcomes: list[PredictionOutcome] = []
+                        predictions: list[CanonicalDocument] = []
+                        references: list[CanonicalDocument] = []
+                        input_tokens: list[int] = []
+                        output_tokens: list[int] = []
+
+                        def _process_one(
+                            example_index: int,
+                            example: Any,
+                            task: TaskId = task,
+                            track: TrackId = track,
+                            fewshot_examples: str = fewshot_examples,
+                            runtime: MockRuntime | GlinerRuntime | VllmRuntime = runtime,
+                        ) -> _DocResult:
+                            speciality_metadata = example.speciality if task == TaskId.SCENARIO else None
+                            prompt = render_prompt(
+                                task=task,
+                                track=track,
+                                document_id=example.document_id,
+                                text=example.text,
+                                fewshot_examples=fewshot_examples,
+                                speciality_metadata=speciality_metadata,
                             )
-                            if parsed_doc is not None:
-                                parsed_doc = parsed_doc.model_copy(
-                                    update={
-                                        "records": [
-                                            align_offsets(rec, example.text)
-                                            for rec in parsed_doc.records
-                                        ]
-                                    }
+                            request = InferenceRequest(
+                                document_id=example.document_id,
+                                task=task,
+                                track=track,
+                                prompt=prompt,
+                                text=example.text,
+                                gold=example.gold,
+                            )
+
+                            t0 = time.perf_counter()
+                            error: str | None = None
+                            try:
+                                raw_output = runtime.infer(request)
+                            except Exception as exc:
+                                raw_output = ""
+                                parsed_doc = None
+                                raw_json_valid = False
+                                repair_applied = False
+                                schema_valid = False
+                                error = f"Runtime error: {exc}"
+                            else:
+                                parsed_doc, raw_json_valid, repair_applied, schema_valid, error = validate_and_parse(
+                                    raw_output,
+                                    task,
                                 )
+                                if parsed_doc is not None:
+                                    parsed_doc = parsed_doc.model_copy(
+                                        update={
+                                            "records": [
+                                                align_offsets(rec, example.text)
+                                                for rec in parsed_doc.records
+                                            ]
+                                        }
+                                    )
 
-                        latency_ms = (time.perf_counter() - t0) * 1000.0
+                            latency_ms = (time.perf_counter() - t0) * 1000.0
 
-                        # NOTE: Fail-fast policy: no regeneration attempt.
-                        # NOTE: Invalid outputs (JSON/schema/contract) become
-                        # NOTE: empty predictions and count in robustness metrics.
-                        final_doc = (
-                            parsed_doc
-                            if parsed_doc is not None and schema_valid
-                            else _empty_prediction(example.document_id, task, example.speciality)
-                        )
+                            # NOTE: Fail-fast policy: no regeneration attempt.
+                            # NOTE: Invalid outputs (JSON/schema/contract) become
+                            # NOTE: empty predictions and count in robustness metrics.
+                            final_doc = (
+                                parsed_doc
+                                if parsed_doc is not None and schema_valid
+                                else _empty_prediction(example.document_id, task, example.speciality)
+                            )
 
-                        return _DocResult(
-                            example_index=example_index,
-                            document_id=example.document_id,
-                            raw_output=raw_output,
-                            parsed_doc=parsed_doc,
-                            raw_json_valid=raw_json_valid,
-                            repair_applied=repair_applied,
-                            schema_valid=schema_valid,
-                            error=error,
-                            latency_ms=latency_ms,
-                            input_tok=_token_count(prompt),
-                            output_tok=_token_count(raw_output),
-                            final_doc=final_doc,
-                        )
+                            return _DocResult(
+                                example_index=example_index,
+                                document_id=example.document_id,
+                                raw_output=raw_output,
+                                parsed_doc=parsed_doc,
+                                raw_json_valid=raw_json_valid,
+                                repair_applied=repair_applied,
+                                schema_valid=schema_valid,
+                                error=error,
+                                latency_ms=latency_ms,
+                                input_tok=_token_count(prompt),
+                                output_tok=_token_count(raw_output),
+                                final_doc=final_doc,
+                            )
 
-                    jsonl_lock = threading.Lock()
-                    results_by_index: dict[int, _DocResult] = {}
+                        jsonl_lock = threading.Lock()
+                        results_by_index: dict[int, _DocResult] = {}
 
-                    with ThreadPoolExecutor(max_workers=concurrency) as pool:
-                        futures = {
-                            pool.submit(_process_one, i, ex): i
-                            for i, ex in enumerate(examples)
-                        }
-                        completed = 0
-                        for future in as_completed(futures):
-                            i = futures[future]
-                            r = future.result()
-                            results_by_index[i] = r
-                            completed += 1
+                        with ThreadPoolExecutor(max_workers=concurrency) as pool:
+                            futures = {
+                                pool.submit(_process_one, i, ex): i
+                                for i, ex in enumerate(examples)
+                            }
+                            completed = 0
+                            for future in as_completed(futures):
+                                i = futures[future]
+                                r = future.result()
+                                results_by_index[i] = r
+                                completed += 1
 
-                            # Write JSONL immediately so the dashboard
-                            # can poll real-time progress from disk.
-                            with jsonl_lock:
-                                store.append_jsonl(
-                                    "timings.jsonl",
-                                    {
-                                        "document_id": r.document_id,
-                                        "task": task.value,
-                                        "track": track.value,
-                                        "latency_ms": r.latency_ms,
-                                        "input_tokens": r.input_tok,
-                                        "output_tokens": r.output_tok,
-                                    },
-                                )
-                                store.append_jsonl(
-                                    "predictions.jsonl",
-                                    {
-                                        "document_id": r.document_id,
-                                        "task": task.value,
-                                        "track": track.value,
-                                        "raw_output": r.raw_output,
-                                        "parsed": canonical_to_dict(r.final_doc),
-                                        "raw_json_valid": r.raw_json_valid,
-                                        "repair_applied": r.repair_applied,
-                                        "is_schema_valid": r.schema_valid,
-                                    },
-                                )
-                                if r.error is not None:
+                                # Write JSONL immediately so the dashboard
+                                # can poll real-time progress from disk.
+                                with jsonl_lock:
                                     store.append_jsonl(
-                                        "errors.jsonl",
+                                        "timings.jsonl",
                                         {
                                             "document_id": r.document_id,
                                             "task": task.value,
                                             "track": track.value,
-                                            "error": r.error,
-                                            "raw_output": r.raw_output,
+                                            "latency_ms": r.latency_ms,
+                                            "input_tokens": r.input_tok,
+                                            "output_tokens": r.output_tok,
                                         },
                                     )
+                                    store.append_jsonl(
+                                        "predictions.jsonl",
+                                        {
+                                            "document_id": r.document_id,
+                                            "task": task.value,
+                                            "track": track.value,
+                                            "raw_output": r.raw_output,
+                                            "parsed": canonical_to_dict(r.final_doc),
+                                            "raw_json_valid": r.raw_json_valid,
+                                            "repair_applied": r.repair_applied,
+                                            "is_schema_valid": r.schema_valid,
+                                        },
+                                    )
+                                    if r.error is not None:
+                                        store.append_jsonl(
+                                            "errors.jsonl",
+                                            {
+                                                "document_id": r.document_id,
+                                                "task": task.value,
+                                                "track": track.value,
+                                                "error": r.error,
+                                                "raw_output": r.raw_output,
+                                            },
+                                        )
 
-                            if completed % 100 == 0:
-                                _log_event(
-                                    logger,
-                                    "inference_progress",
-                                    task=task.value,
-                                    track=track.value,
-                                    completed=completed,
-                                    total=len(examples),
-                                )
+                                if completed % 100 == 0:
+                                    _log_event(
+                                        logger,
+                                        "inference_progress",
+                                        task=task.value,
+                                        track=track.value,
+                                        completed=completed,
+                                        total=len(examples),
+                                    )
 
-                    # Reconstruct ordered lists for scoring (predictions[i] ↔ references[i]).
-                    for i in range(len(examples)):
-                        r = results_by_index[i]
-                        outcome = PredictionOutcome(
-                            document_id=r.document_id,
-                            task=task,
-                            raw_output=r.raw_output,
-                            parsed=r.parsed_doc,
-                            raw_json_valid=r.raw_json_valid,
-                            repair_applied=r.repair_applied,
-                            is_schema_valid=r.schema_valid,
-                            error=r.error,
-                            latency_ms=r.latency_ms,
+                        # Reconstruct ordered lists for scoring (predictions[i] ↔ references[i]).
+                        for i in range(len(examples)):
+                            r = results_by_index[i]
+                            outcome = PredictionOutcome(
+                                document_id=r.document_id,
+                                task=task,
+                                raw_output=r.raw_output,
+                                parsed=r.parsed_doc,
+                                raw_json_valid=r.raw_json_valid,
+                                repair_applied=r.repair_applied,
+                                is_schema_valid=r.schema_valid,
+                                error=r.error,
+                                latency_ms=r.latency_ms,
+                            )
+                            outcomes.append(outcome)
+                            input_tokens.append(r.input_tok)
+                            output_tokens.append(r.output_tok)
+                            predictions.append(r.final_doc)
+                            references.append(examples[i].gold)
+
+                        robustness = _robustness_metrics(outcomes, input_tokens, output_tokens)
+                        scoring = _compute_task_metrics(task, predictions, references, robustness)
+                        per_task_metrics[task.value] = scoring.metrics
+                        per_task_doc_counts[task.value] = scoring.official_doc_counts
+                        per_task_bootstrap[task.value] = bootstrap_official_score(
+                            doc_counts=scoring.official_doc_counts,
+                            repetitions=1000,
+                            seed=42,
                         )
-                        outcomes.append(outcome)
-                        input_tokens.append(r.input_tok)
-                        output_tokens.append(r.output_tok)
-                        predictions.append(r.final_doc)
-                        references.append(examples[i].gold)
 
-                    robustness = _robustness_metrics(outcomes, input_tokens, output_tokens)
-                    scoring = _compute_task_metrics(task, predictions, references, robustness)
-                    per_task_metrics[task.value] = scoring.metrics
-                    per_task_doc_counts[task.value] = scoring.official_doc_counts
-                    per_task_bootstrap[task.value] = bootstrap_official_score(
-                        doc_counts=scoring.official_doc_counts,
+                    global_bootstrap = bootstrap_global_score(
+                        per_task_doc_counts=per_task_doc_counts,
                         repetitions=1000,
                         seed=42,
                     )
-
-                global_bootstrap = bootstrap_global_score(
-                    per_task_doc_counts=per_task_doc_counts,
-                    repetitions=1000,
-                    seed=42,
-                )
-                track_reports.append(
-                    TrackReport(
-                        track=track,
-                        per_task=per_task_metrics,
-                        per_task_bootstrap=per_task_bootstrap,
-                        global_score=global_bootstrap.score_full,
-                        global_bootstrap=global_bootstrap,
+                    track_reports.append(
+                        TrackReport(
+                            track=track,
+                            per_task=per_task_metrics,
+                            per_task_bootstrap=per_task_bootstrap,
+                            global_score=global_bootstrap.score_full,
+                            global_bootstrap=global_bootstrap,
+                        )
                     )
+
+                elapsed = time.perf_counter() - started
+                metadata.finished_at_utc = datetime.now(tz=UTC).isoformat()
+                metadata.elapsed_seconds = elapsed
+                metadata.run_status = "success"
+
+                export_reports(run_dir=run_dir, run_id=run_id, reports=track_reports)
+                store.write_json("run_metadata.json", metadata.model_dump(mode="json"))
+                store.write_text(
+                    "resolved_config.yaml",
+                    _dump_yaml(
+                        {
+                            "suite": suite.suite_id,
+                            "benchmark_version": suite.benchmark_version,
+                            "tasks": [task.value for task in tasks],
+                            "tracks": [track.value for track in tracks],
+                            "model": model_cfg.model_id,
+                            "runtime": runtime_name.value,
+                            "parameters": suite.parameters,
+                        }
+                    ),
+                )
+                store.write_text("git_sha.txt", _git_sha() + "\n")
+                store.write_json(
+                    "environment.json",
+                    {
+                        "python_version": platform.python_version(),
+                        "platform": platform.platform(),
+                        "runtime_name": runtime.name,
+                        "runtime_version": runtime.version,
+                    },
+                )
+                store.write_text("docker_image.txt", (metadata.image_digest or "unknown") + "\n")
+                store.write_json("server_args.json", runtime_payload)
+                store.write_json("dataset_fingerprint.json", {"fingerprint": metadata.dataset_fingerprint})
+                store.write_json("prompt_hashes.json", metadata.prompt_hashes)
+                store.write_json(
+                    "run_status.json",
+                    {
+                        "run_id": run_id,
+                        "status": metadata.run_status,
+                        "started_at_utc": metadata.started_at_utc,
+                        "finished_at_utc": metadata.finished_at_utc,
+                        "elapsed_seconds": metadata.elapsed_seconds,
+                    },
+                )
+                store.write_json(
+                    "export_manifest.json",
+                    {
+                        "export_mode": metadata.export_mode,
+                        "destination": metadata.export_destination or str(run_dir),
+                    },
+                )
+                store.write_json(
+                    "pod_info.json",
+                    {
+                        "runpod_pod_id": metadata.runpod_pod_id,
+                        "runpod_template_id": metadata.runpod_template_id,
+                        "gpu_name": metadata.gpu_name,
+                        "gpu_count": metadata.gpu_count,
+                        "vram_gb": metadata.vram_gb,
+                    },
                 )
 
-            elapsed = time.perf_counter() - started
-            metadata.finished_at_utc = datetime.now(tz=UTC).isoformat()
-            metadata.elapsed_seconds = elapsed
-            metadata.run_status = "success"
-
-            export_reports(run_dir=run_dir, run_id=run_id, reports=track_reports)
-            store.write_json("run_metadata.json", metadata.model_dump(mode="json"))
-            store.write_text(
-                "resolved_config.yaml",
-                _dump_yaml(
-                    {
-                        "suite": suite.suite_id,
-                        "benchmark_version": suite.benchmark_version,
-                        "tasks": [task.value for task in tasks],
-                        "tracks": [track.value for track in tracks],
-                        "model": model_cfg.model_id,
-                        "runtime": runtime_name.value,
-                        "parameters": suite.parameters,
-                    }
-                ),
+                prompt_lines: list[str] = []
+                for key in sorted(prompt_snapshots):
+                    prompt_lines.append(f"## {key}")
+                    prompt_lines.append(f"HASH: {prompt_snapshots[key]['hash']}")
+                    prompt_lines.append(prompt_snapshots[key]["prompt"])
+                    prompt_lines.append("")
+                store.write_text("prompt_snapshot.txt", "\n".join(prompt_lines).rstrip() + "\n")
+                runtime.close()
+                _log_event(logger, "run_finished", run_id=run_id, elapsed_seconds=elapsed)
+                produced_runs.append(run_dir)
+        except Exception:
+            logging.getLogger(__name__).exception(
+                "Model %s failed - skipping to next model",
+                model_id,
             )
-            store.write_text("git_sha.txt", _git_sha() + "\n")
-            store.write_json(
-                "environment.json",
-                {
-                    "python_version": platform.python_version(),
-                    "platform": platform.platform(),
-                    "runtime_name": runtime.name,
-                    "runtime_version": runtime.version,
-                },
-            )
-            store.write_text("docker_image.txt", (metadata.image_digest or "unknown") + "\n")
-            store.write_json("server_args.json", runtime_payload)
-            store.write_json("dataset_fingerprint.json", {"fingerprint": metadata.dataset_fingerprint})
-            store.write_json("prompt_hashes.json", metadata.prompt_hashes)
-            store.write_json(
-                "run_status.json",
-                {
-                    "run_id": run_id,
-                    "status": metadata.run_status,
-                    "started_at_utc": metadata.started_at_utc,
-                    "finished_at_utc": metadata.finished_at_utc,
-                    "elapsed_seconds": metadata.elapsed_seconds,
-                },
-            )
-            store.write_json(
-                "export_manifest.json",
-                {
-                    "export_mode": metadata.export_mode,
-                    "destination": metadata.export_destination or str(run_dir),
-                },
-            )
-            store.write_json(
-                "pod_info.json",
-                {
-                    "runpod_pod_id": metadata.runpod_pod_id,
-                    "runpod_template_id": metadata.runpod_template_id,
-                    "gpu_name": metadata.gpu_name,
-                    "gpu_count": metadata.gpu_count,
-                    "vram_gb": metadata.vram_gb,
-                },
-            )
-
-            prompt_lines: list[str] = []
-            for key in sorted(prompt_snapshots):
-                prompt_lines.append(f"## {key}")
-                prompt_lines.append(f"HASH: {prompt_snapshots[key]['hash']}")
-                prompt_lines.append(prompt_snapshots[key]["prompt"])
-                prompt_lines.append("")
-            store.write_text("prompt_snapshot.txt", "\n".join(prompt_lines).rstrip() + "\n")
-            runtime.close()
-            _log_event(logger, "run_finished", run_id=run_id, elapsed_seconds=elapsed)
+            continue
 
     return produced_runs
 
