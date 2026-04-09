@@ -312,10 +312,24 @@ def _tracks_for_runtime(
     raise ValueError("GLiNER requires the `zero-shot` track.")
 
 
+def _read_log_tail(log_path: Path | None, max_lines: int = 50) -> str:
+    """Read the last *max_lines* of a log file, returning an empty string on failure."""
+
+    if log_path is None or not log_path.exists():
+        return ""
+    try:
+        lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+        tail = lines[-max_lines:]
+        return "\n".join(tail)
+    except Exception:
+        return ""
+
+
 def _wait_http_ready(
     url: str,
     timeout_seconds: int,
     process: subprocess.Popen[bytes] | None = None,
+    log_path: Path | None = None,
 ) -> None:
     """Wait until an HTTP URL responds with a 2xx status.
 
@@ -326,9 +340,11 @@ def _wait_http_ready(
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
         if process is not None and process.poll() is not None:
+            tail = _read_log_tail(log_path)
+            detail = f"\n--- vLLM server log (last lines) ---\n{tail}" if tail else ""
             raise RuntimeError(
                 f"vLLM server exited unexpectedly (returncode={process.returncode}) "
-                f"before becoming ready. Check the vLLM server log for details."
+                f"before becoming ready.{detail}"
             )
         try:
             with urlopen(url, timeout=2) as response:
@@ -338,7 +354,11 @@ def _wait_http_ready(
         except (URLError, TimeoutError, ValueError):
             pass
         time.sleep(1)
-    raise TimeoutError(f"vLLM server did not become ready within {timeout_seconds}s: {url}")
+    tail = _read_log_tail(log_path)
+    detail = f"\n--- vLLM server log (last lines) ---\n{tail}" if tail else ""
+    raise TimeoutError(
+        f"vLLM server did not become ready within {timeout_seconds}s: {url}{detail}"
+    )
 
 
 @contextmanager
@@ -400,7 +420,7 @@ def _managed_vllm_server(
             log_path=str(log_path),
         )
         try:
-            _wait_http_ready(health_url, timeout_seconds=timeout_seconds, process=process)
+            _wait_http_ready(health_url, timeout_seconds=timeout_seconds, process=process, log_path=log_path)
             _log_event(logger, "vllm_server_ready", model_reference=model_reference)
             yield
         finally:
@@ -522,6 +542,44 @@ def _resolve_model_reference(
     return prefetch.local_path, prefetch
 
 
+def _preflight_check_hf_access(
+    execution_models: list[str],
+    suite: SuiteConfig,
+    settings: Any,
+) -> None:
+    """Verify HF API access for all models before starting the campaign.
+
+    Fails fast with a clear message when a model is inaccessible, avoiding
+    hours of wasted GPU time on earlier models.
+    """
+
+    from huggingface_hub import repo_info
+
+    failures: list[str] = []
+    for model_id in execution_models:
+        runtime_name = suite.runtime_overrides.get(model_id, suite.runtime_default)
+        if runtime_name not in {RuntimeName.VLLM, RuntimeName.GLINER}:
+            continue
+        model_cfg = load_model(model_id)
+        try:
+            repo_info(
+                repo_id=model_cfg.hf_id,
+                revision=model_cfg.revision,
+                token=settings.hf_token,
+                repo_type="model",
+            )
+        except Exception as exc:
+            failures.append(f"  - {model_id} ({model_cfg.hf_id}@{model_cfg.revision}): {exc}")
+
+    if failures:
+        detail = "\n".join(failures)
+        raise RuntimeError(
+            f"Preflight HF access check failed for {len(failures)} model(s):\n"
+            f"{detail}\n\n"
+            "Fix: ensure HF_TOKEN is set and you have accepted the license for each gated model."
+        )
+
+
 def run_campaign(
     *,
     suite_path: Path,
@@ -564,6 +622,8 @@ def run_campaign(
         model_selection=model_selection,
     )
     settings = get_settings()
+
+    _preflight_check_hf_access(execution_models, suite, settings)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     produced_runs: list[Path] = []
