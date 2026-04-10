@@ -549,11 +549,12 @@ def _preflight_check_hf_access(
 ) -> None:
     """Verify HF API access for all models before starting the campaign.
 
-    Fails fast with a clear message when a model is inaccessible, avoiding
-    hours of wasted GPU time on earlier models.
+    Uses ``list_repo_files`` which requires full read access (fails on gated
+    repos when the token lacks permission).  Fails fast with a clear message
+    when a model is inaccessible, avoiding hours of wasted GPU time.
     """
 
-    from huggingface_hub import repo_info
+    from huggingface_hub import list_repo_files
 
     failures: list[str] = []
     for model_id in execution_models:
@@ -562,7 +563,7 @@ def _preflight_check_hf_access(
             continue
         model_cfg = load_model(model_id)
         try:
-            repo_info(
+            list_repo_files(
                 repo_id=model_cfg.hf_id,
                 revision=model_cfg.revision,
                 token=settings.hf_token,
