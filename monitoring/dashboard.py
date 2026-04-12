@@ -1,3 +1,11 @@
+"""Terminal dashboard for live benchmark monitoring.
+
+This monitor watches the run directories emitted by PARHAF-LM-CLINBENCH and
+surfaces the execution state that matters operationally: which model is
+running, how quickly documents are processed, whether outputs remain valid
+JSON, and what the latest run events say about failures or progress.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -5,9 +13,9 @@ import json
 import math
 import statistics
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from rich.console import Console
 from rich.layout import Layout
@@ -16,9 +24,10 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-# ── helpers ───────────────────────────────────────────────────────────────────
 
 def _fmt_elapsed(seconds: float | None) -> str:
+    """Format a duration in seconds into a compact human-readable string."""
+
     if seconds is None:
         return "—"
     m, s = divmod(int(seconds), 60)
@@ -31,28 +40,36 @@ def _fmt_elapsed(seconds: float | None) -> str:
 
 
 def _fmt_f1(value: float | None) -> str:
+    """Format an F1 score for the dashboard table."""
+
     if value is None:
         return "—"
     return f"{value:.3f}"
 
 
 def _pct(value: float | None) -> str:
+    """Format a ratio as a percentage string."""
+
     if value is None:
         return "—"
     return f"{value * 100:.1f}%"
 
 
 def _now_elapsed(started_at_utc: str | None) -> float | None:
+    """Compute elapsed seconds from an ISO-8601 UTC timestamp."""
+
     if started_at_utc is None:
         return None
     try:
-        start = datetime.fromisoformat(started_at_utc).replace(tzinfo=timezone.utc)
-        return (datetime.now(tz=timezone.utc) - start).total_seconds()
-    except Exception:
+        start = datetime.fromisoformat(started_at_utc).replace(tzinfo=UTC)
+        return (datetime.now(tz=UTC) - start).total_seconds()
+    except ValueError:
         return None
 
 
 def _pct95(values: list[float]) -> float:
+    """Return the empirical 95th percentile of a numeric list."""
+
     if not values:
         return 0.0
     s = sorted(values)
@@ -60,9 +77,9 @@ def _pct95(values: list[float]) -> float:
     return s[idx]
 
 
-# ── file readers ──────────────────────────────────────────────────────────────
-
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    """Read a JSONL file and skip malformed lines."""
+
     rows: list[dict[str, Any]] = []
     try:
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -78,13 +95,20 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def _read_json(path: Path) -> dict[str, Any]:
+    """Read a JSON object from disk and degrade to an empty mapping."""
+
     try:
-        return json.loads(path.read_text(encoding="utf-8"))  # type: ignore[return-value]
+        payload = json.loads(path.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
+    if not isinstance(payload, dict):
+        return {}
+    return cast(dict[str, Any], payload)
 
 
 def _read_log_events(path: Path, last_n: int = 12) -> list[dict[str, Any]]:
+    """Read the latest structured log events from a run log file."""
+
     events: list[dict[str, Any]] = []
     try:
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -105,19 +129,18 @@ def _read_log_events(path: Path, last_n: int = 12) -> list[dict[str, Any]]:
     return events[-last_n:]
 
 
-# ── run dir discovery ─────────────────────────────────────────────────────────
-
 def _find_run_dirs(output_dir: Path) -> list[Path]:
-    """Return all run dirs sorted oldest → newest by name (run IDs are timestamped)."""
+    """Return all run directories sorted oldest -> newest by name."""
+
     if not output_dir.exists():
         return []
     dirs = [d for d in output_dir.iterdir() if d.is_dir() and (d / "logs").exists()]
     return sorted(dirs, key=lambda d: d.name)
 
 
-# ── metrics extraction ────────────────────────────────────────────────────────
-
 def _timings_stats(timings: list[dict[str, Any]]) -> dict[str, float]:
+    """Aggregate latency and token statistics from timing rows."""
+
     latencies = [row["latency_ms"] for row in timings if "latency_ms" in row]
     in_tok = [row["input_tokens"] for row in timings if "input_tokens" in row]
     out_tok = [row["output_tokens"] for row in timings if "output_tokens" in row]
@@ -135,6 +158,8 @@ def _timings_stats(timings: list[dict[str, Any]]) -> dict[str, float]:
 
 
 def _quality_stats(predictions: list[dict[str, Any]], errors: list[dict[str, Any]]) -> dict[str, Any]:
+    """Compute output-validity diagnostics for a run."""
+
     n = len(predictions)
     valid_json = sum(1 for r in predictions if r.get("raw_json_valid"))
     repaired = sum(1 for r in predictions if r.get("repair_applied"))
@@ -149,6 +174,8 @@ def _quality_stats(predictions: list[dict[str, Any]], errors: list[dict[str, Any
 
 
 def _global_score_from_metrics(metrics_json: dict[str, Any]) -> float | None:
+    """Return the average global score across available prompting tracks."""
+
     tracks = metrics_json.get("tracks", [])
     if not tracks:
         return None
@@ -158,9 +185,9 @@ def _global_score_from_metrics(metrics_json: dict[str, Any]) -> float | None:
     return float(statistics.mean(scores))
 
 
-# ── renderers ─────────────────────────────────────────────────────────────────
-
 def _render_header(run_dirs: list[Path], campaign_start: str | None) -> Panel:
+    """Render the top status banner for the full benchmark campaign."""
+
     elapsed = _now_elapsed(campaign_start)
     n_done = sum(1 for d in run_dirs if _read_json(d / "run_status.json").get("status") == "success")
     n_total = len(run_dirs)
@@ -181,6 +208,8 @@ def _render_header(run_dirs: list[Path], campaign_start: str | None) -> Panel:
 
 
 def _render_current_run(run_dir: Path | None) -> Panel:
+    """Render the summary panel for the currently active model run."""
+
     if run_dir is None:
         return Panel(Text("No active run found.", style="dim"), title="Current Run")
 
@@ -237,6 +266,8 @@ def _render_current_run(run_dir: Path | None) -> Panel:
 
 
 def _render_model_table(run_dirs: list[Path]) -> Panel:
+    """Render the model-by-model execution summary table."""
+
     table = Table(show_header=True, header_style="bold", box=None, padding=(0, 1))
     table.add_column("#", style="dim", width=3)
     table.add_column("Model", min_width=20)
@@ -279,6 +310,8 @@ def _render_model_table(run_dirs: list[Path]) -> Panel:
 
 
 def _render_events(run_dir: Path | None) -> Panel:
+    """Render the latest structured log events for the active run."""
+
     if run_dir is None:
         return Panel(Text("No events.", style="dim"), title="Recent Events")
 
@@ -317,9 +350,9 @@ def _render_events(run_dir: Path | None) -> Panel:
     return Panel(lines, title="[bold]Recent Events[/bold]")
 
 
-# ── layout ────────────────────────────────────────────────────────────────────
+def _build_layout(run_dirs: list[Path]) -> Layout:
+    """Assemble the Rich layout tree from the discovered run directories."""
 
-def _build_layout(run_dirs: list[Path]) -> Any:
     active_run = None
     for d in reversed(run_dirs):
         status = _read_json(d / "run_status.json").get("status", "running")
@@ -354,9 +387,9 @@ def _build_layout(run_dirs: list[Path]) -> Any:
     return layout
 
 
-# ── main ──────────────────────────────────────────────────────────────────────
-
 def main() -> None:
+    """Start the live terminal dashboard and refresh it until interrupted."""
+
     parser = argparse.ArgumentParser(
         prog="dashboard",
         description="Live monitoring dashboard for prehaf-clibench benchmark runs.",

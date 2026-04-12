@@ -88,6 +88,7 @@ def test_run_campaign_prioritizes_gliner_model_first(
 
     monkeypatch.setattr(runner_module, "_build_runtime", fake_build_runtime)
     monkeypatch.setattr(runner_module, "_resolve_model_reference", fake_resolve_model_reference)
+    monkeypatch.setattr(runner_module, "_preflight_check_hf_access", lambda *a, **k: None)
 
     runs = run_campaign(
         suite_path=suite_path,

@@ -15,6 +15,13 @@ dependencies = [
   "gliner2>=0.3.1",
   "huggingface-hub>=0.24",
   "datasets>=2.21",
+  "streamlit>=1.39",
+  "streamlit-extras>=0.4",
+  "streamlit-option-menu>=0.3.12",
+  "plotly>=5.24",
+  "pandas>=2.2",
+  "pyarrow>=17.0",
+  "numpy>=2.0",
 ]
 
 [project.optional-dependencies]
@@ -24,6 +31,8 @@ dev = [
   "mypy>=1.11",
   "ruff>=0.6",
   "pre-commit>=4.5.1",
+  "pandas-stubs>=2.2.3.250308",
+  "rich>=13.0",
   "types-PyYAML>=6.0.12.20240917",
   "types-requests>=2.32.0.20250328",
 ]
@@ -33,6 +42,7 @@ locale = [
 monitoring = [
   "rich>=13.0",
 ]
+
 
 [project.scripts]
 parhaf-clinbench = "parhaf_clinbench.cli.main:main"
@@ -56,11 +66,11 @@ select = ["E", "F", "I", "B", "UP", "N", "W", "RUF"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["parhaf_clinbench"]
+known-first-party = ["parhaf_clinbench", "ui", "monitoring"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = "-q --disable-warnings"
+addopts = "-q --disable-warnings --cov=parhaf_clinbench --cov=ui --cov=monitoring --cov-report=term-missing"
 testpaths = ["tests"]
 
 [tool.mypy]
@@ -75,8 +85,30 @@ check_untyped_defs = true
 no_implicit_optional = true
 show_error_codes = true
 pretty = true
-files = ["src", "tests"]
+files = ["src", "tests", "ui", "monitoring"]
+
+[[tool.mypy.overrides]]
+module = [
+  "pandas",
+  "plotly",
+  "plotly.*",
+  "pyarrow",
+  "rich",
+  "rich.*",
+  "streamlit",
+  "streamlit.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["pyarrow"]
+ignore_missing_imports = true
+disable_error_code = ["import-untyped"]
 
 [tool.coverage.run]
-source = ["parhaf_clinbench"]
+source = ["parhaf_clinbench", "ui", "monitoring"]
 branch = true
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true

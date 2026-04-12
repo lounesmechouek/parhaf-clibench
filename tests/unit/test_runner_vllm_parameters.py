@@ -91,6 +91,7 @@ def test_run_campaign_applies_suite_generation_params_to_vllm_payload(
 
     monkeypatch.setattr(runner_module, "_managed_vllm_server", fake_server_context)
     monkeypatch.setattr(runner_module, "run_healthcheck", fake_run_healthcheck)
+    monkeypatch.setattr(runner_module, "_preflight_check_hf_access", lambda *a, **k: None)
     monkeypatch.setattr(
         runner_module,
         "_resolve_model_reference",
@@ -160,6 +161,7 @@ def test_run_campaign_propagates_max_workers_to_runtime_payload(
 
     monkeypatch.setattr(runner_module, "_managed_vllm_server", fake_server_context)
     monkeypatch.setattr(runner_module, "run_healthcheck", lambda *a, **kw: None)
+    monkeypatch.setattr(runner_module, "_preflight_check_hf_access", lambda *a, **k: None)
     monkeypatch.setattr(
         runner_module,
         "_resolve_model_reference",

@@ -7,17 +7,17 @@ repos:
     hooks:
       - id: ruff-check
         name: ruff check
-        entry: uv run ruff check src tests
+        entry: .venv/bin/ruff check src tests ui monitoring
         language: system
         pass_filenames: false
       - id: mypy
         name: mypy
-        entry: uv run mypy
+        entry: .venv/bin/mypy
         language: system
         pass_filenames: false
       - id: pytest
         name: pytest
-        entry: uv run pytest
+        entry: .venv/bin/pytest
         language: system
         pass_filenames: false
         always_run: true

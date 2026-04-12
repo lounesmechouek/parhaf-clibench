@@ -1,0 +1,15 @@
+{
+  "bootstrap_repetitions": 1000,
+  "n_models": 7,
+  "n_predictions": 65065,
+  "n_errors": 25880,
+  "n_gold_docs": {
+    "pseudo": 509,
+    "infectio": 134,
+    "response": 108,
+    "scenario": 4254
+  },
+  "audit": {
+    "ok": 52
+  }
+}

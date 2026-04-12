@@ -123,6 +123,7 @@ def _patch_runner(monkeypatch: pytest.MonkeyPatch, runtime: Any) -> None:
         "_build_runtime",
         lambda *a, **kw: runtime,
     )
+    monkeypatch.setattr(runner_module, "_preflight_check_hf_access", lambda *a, **k: None)
 
 
 def _smoke_suite_yaml(tmp_path: Path, max_workers: int = 2) -> Path:
