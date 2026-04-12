@@ -11,7 +11,7 @@ quality?" without digging through raw text.
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 
@@ -58,7 +58,7 @@ def build_error_taxonomy(suite: dict[str, RunArtifacts]) -> pd.DataFrame:
             df.groupby(["task", "track", "category"]).size().reset_index(name="count")
         )
         grouped["model"] = model
-        rows.extend(grouped.to_dict(orient="records"))
+        rows.extend(cast(list[dict[str, Any]], grouped.to_dict(orient="records")))
     if not rows:
         return pd.DataFrame(columns=["model", "task", "track", "category", "count"])
     return pd.DataFrame(rows)[["model", "task", "track", "category", "count"]]

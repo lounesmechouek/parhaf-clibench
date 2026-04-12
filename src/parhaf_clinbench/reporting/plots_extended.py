@@ -126,19 +126,20 @@ def forest_plot(scores: pd.DataFrame, *, track: str) -> go.Figure:
     colors = _color_map(df["model"].unique())
     fig = go.Figure()
     for model, sub in df.groupby("model", sort=False):
+        model_name = str(model)
         fig.add_trace(
             go.Scatter(
                 x=sub["f1"],
                 y=[f"{row.task_label} — {row.model}" for row in sub.itertuples()],
                 mode="markers",
-                name=model,
-                marker=dict(color=colors[model], size=10),
+                name=model_name,
+                marker=dict(color=colors[model_name], size=10),
                 error_x=dict(
                     type="data",
                     symmetric=False,
                     array=(sub["ci_high"] - sub["f1"]).clip(lower=0),
                     arrayminus=(sub["f1"] - sub["ci_low"]).clip(lower=0),
-                    color=colors[model],
+                    color=colors[model_name],
                 ),
             )
         )
@@ -215,11 +216,12 @@ def latency_box(timings: pd.DataFrame) -> go.Figure:
     colors = _color_map(timings["model"].unique())
     fig = go.Figure()
     for model, sub in timings.groupby("model"):
+        model_name = str(model)
         fig.add_trace(
             go.Box(
                 y=sub["latency_ms"],
-                name=model,
-                marker_color=colors[model],
+                name=model_name,
+                marker_color=colors[model_name],
                 boxmean=True,
             )
         )

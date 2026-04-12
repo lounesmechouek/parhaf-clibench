@@ -93,7 +93,9 @@ def _predictions_to_canonical(
         df = run.predictions
         mask = (df["task"] == task) & (df["track"] == track)
         for _, row in df[mask].iterrows():
-            by_doc[str(row["document_id"])] = row.get("parsed")
+            parsed = row.get("parsed")
+            if isinstance(parsed, dict):
+                by_doc[str(row["document_id"])] = parsed
 
     canonical: list[CanonicalDocument] = []
     for ref in references:
