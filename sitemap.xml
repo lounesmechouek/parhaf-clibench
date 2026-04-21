@@ -1,415 +1,415 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://lounesmechouek.com/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/about/changelog.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/about/changelog.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/about/contributing.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/about/contributing.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/about/license.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/about/license.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/concepts/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/concepts/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/concepts/datasets-and-tasks.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/concepts/datasets-and-tasks.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/concepts/robustness.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/concepts/robustness.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/concepts/runtimes.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/concepts/runtimes.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/concepts/scoring.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/concepts/scoring.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/concepts/tracks-and-prompts.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/concepts/tracks-and-prompts.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/getting-started/installation.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/getting-started/installation.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/getting-started/quickstart.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/getting-started/quickstart.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/getting-started/smoke.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/getting-started/smoke.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/guide/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/guide/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/guide/adding-a-model.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/guide/adding-a-model.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/guide/configuring-a-suite.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/guide/configuring-a-suite.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/guide/monitoring.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/guide/monitoring.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/guide/reading-results.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/guide/reading-results.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/guide/running-a-benchmark.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/guide/running-a-benchmark.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/guide/ui.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/guide/ui.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/artifacts.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/artifacts.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/ci.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/ci.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/determinism.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/determinism.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/docker.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/docker.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/manifests.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/manifests.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/runpod.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/runpod.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/scoring-audit.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/scoring-audit.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/llmops/versioning.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/llmops/versioning.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/SUMMARY.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/SUMMARY.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/chunking/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/chunking/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/chunking/merger.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/chunking/merger.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/chunking/splitter.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/chunking/splitter.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/cli/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/cli/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/cli/main.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/cli/main.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/core/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/core/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/core/enums.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/core/enums.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/core/hashing.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/core/hashing.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/core/ids.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/core/ids.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/core/models.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/core/models.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/core/settings.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/core/settings.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/data/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/data/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/data/canonicalize.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/data/canonicalize.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/data/contracts_audit.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/data/contracts_audit.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/data/hf_loaders.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/data/hf_loaders.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/data/manifests.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/data/manifests.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/data/prefetch.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/data/prefetch.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/ops/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/ops/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/ops/collect_results.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/ops/collect_results.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/ops/launch_runpod.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/ops/launch_runpod.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/ops/poll_runpod.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/ops/poll_runpod.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/ops/quality_gate.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/ops/quality_gate.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/ops/runpod_client.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/ops/runpod_client.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/ops/stop_runpod.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/ops/stop_runpod.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/orchestration/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/orchestration/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/orchestration/artifact_store.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/orchestration/artifact_store.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/orchestration/experiment_plan.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/orchestration/experiment_plan.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/orchestration/healthchecks.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/orchestration/healthchecks.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/orchestration/runner.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/orchestration/runner.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/parsing/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/parsing/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/parsing/align.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/parsing/align.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/parsing/normalize.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/parsing/normalize.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/parsing/repair.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/parsing/repair.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/parsing/validate.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/parsing/validate.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/prompting/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/prompting/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/prompting/contracts.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/prompting/contracts.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/prompting/registry.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/prompting/registry.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/prompting/render.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/prompting/render.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/export.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/export.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/loader.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/loader.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/markdown.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/markdown.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/plots.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/plots.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/plots_extended.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/plots_extended.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/tables.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/tables.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/analysis/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/analysis/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/analysis/error_taxonomy.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/analysis/error_taxonomy.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/analysis/frames.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/analysis/frames.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/analysis/local_gold.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/analysis/local_gold.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/analysis/rescoring.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/analysis/rescoring.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/reporting/analysis/subgroups.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/reporting/analysis/subgroups.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/runtimes/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/runtimes/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/runtimes/base.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/runtimes/base.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/runtimes/gliner.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/runtimes/gliner.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/runtimes/mock.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/runtimes/mock.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/runtimes/prefetch.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/runtimes/prefetch.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/runtimes/vllm.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/runtimes/vllm.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/aggregate.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/aggregate.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/bootstrap.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/bootstrap.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/common.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/common.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/infectio.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/infectio.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/pseudo.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/pseudo.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/response.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/response.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/scoring/scenario.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/scoring/scenario.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/tasks/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/tasks/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/tasks/base.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/tasks/base.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/tasks/infectio.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/tasks/infectio.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/tasks/pseudo.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/tasks/pseudo.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/tasks/response.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/tasks/response.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/reference/parhaf_clinbench/tasks/scenario.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/reference/parhaf_clinbench/tasks/scenario.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
     <url>
-         <loc>https://lounesmechouek.com/studies/index.html</loc>
+         <loc>https://lounesmechouek.github.io/parhaf-clibench/studies/index.html</loc>
          <lastmod>2026-04-21</lastmod>
     </url>
 </urlset>
