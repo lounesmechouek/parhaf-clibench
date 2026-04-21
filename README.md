@@ -70,7 +70,7 @@ time, scores the results with bootstrap confidence intervals,
 reports robustness metrics alongside accuracy, and writes an
 artifact tree that the Streamlit UI and the terminal monitoring
 dashboard read back. The package and the results of the
-[study v1](https://lounesmechouek.com/writing/slm_benchmark/) are
+[pilot study](https://lounesmechouek.com/writing/slm_benchmark/) are
 distinct artifacts. The package is a general runner. The study is
 one instance of what it produces.
 
@@ -198,7 +198,7 @@ deltas, robustness, subgroups, error taxonomy, and methodology.
 uv run python -m monitoring.dashboard --run-dir results/<run_id>
 ```
 
-![Terminal monitoring dashboard](https://lounesmechouek.github.io/parhaf-clibench/assets/dashboard_parhaf.png)
+![Terminal monitoring dashboard](https://lounesmechouek.github.io/parhaf-clibench/assets/dashboard.png)
 
 The dashboard attaches to a live or finished run directory and
 displays the active cell, latency distribution, throughput, output
@@ -299,7 +299,7 @@ Full contribution guidelines are on the
 }
 ```
 
-The [study v1](https://lounesmechouek.com/writing/slm_benchmark/)
+The [pilot study](https://lounesmechouek.com/writing/slm_benchmark/)
 has its own reference documented on the companion page.
 
 ## License and acknowledgements

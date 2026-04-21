@@ -1,7 +1,7 @@
 site_name: parhaf-clibench
 site_description: A reproducible benchmark for clinical information extraction with language models on PARHAF.
 site_author: Lounes Mechouek
-site_url: https://lounesmechouek.com
+site_url: https://lounesmechouek.github.io/parhaf-clibench/
 repo_url: https://github.com/lounesmechouek/parhaf-clibench
 repo_name: lounesmechouek/parhaf-clibench
 edit_uri: edit/main/docs/
