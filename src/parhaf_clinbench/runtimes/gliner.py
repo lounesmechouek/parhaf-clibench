@@ -246,7 +246,7 @@ class GlinerRuntime(RuntimeBackend):
         if self._model is not None:
             return self._model
         try:
-            import gliner2 as gliner2_module  # type: ignore[import-untyped]
+            import gliner2 as gliner2_module
             from gliner2 import GLiNER2
         except Exception as exc:
             raise RuntimeError(
@@ -415,7 +415,7 @@ class GlinerRuntime(RuntimeBackend):
             try:
                 from transformers import AutoTokenizer
 
-                self._tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
+                self._tokenizer = AutoTokenizer.from_pretrained(
                     self._model_reference,
                     revision=self._tokenizer_revision,
                     trust_remote_code=True,

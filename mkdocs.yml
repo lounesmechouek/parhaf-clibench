@@ -1,0 +1,181 @@
+site_name: parhaf-clibench
+site_description: A reproducible benchmark for clinical information extraction with language models on PARHAF.
+site_author: Lounes Mechouek
+site_url: https://lounesmechouek.com
+repo_url: https://github.com/lounesmechouek/parhaf-clibench
+repo_name: lounesmechouek/parhaf-clibench
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Lounes Mechouek
+docs_dir: docs
+exclude_docs: _scripts/
+use_directory_urls: false
+
+theme:
+  name: material
+  language: en
+  logo: assets/logo.svg
+  favicon: assets/favicon.svg
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - search.suggest
+    - search.highlight
+    - search.share
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/lounesmechouek/parhaf-clibench
+    - icon: fontawesome/solid/globe
+      link: https://lounesmechouek.com
+  generator: false
+
+extra_css:
+  - assets/extra.css
+
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/_scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            separate_signature: true
+            line_length: 88
+            merge_init_into_class: true
+            show_if_no_docstring: false
+            filters:
+              - "!^_"
+              - "!^__pycache__"
+            summary: true
+            inherited_members: false
+            docstring_section_style: table
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - tables
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+      - Smoke test: getting-started/smoke.md
+  - Concepts:
+      - Overview: concepts/index.md
+      - Datasets and tasks: concepts/datasets-and-tasks.md
+      - Tracks and prompts: concepts/tracks-and-prompts.md
+      - Runtimes: concepts/runtimes.md
+      - Scoring and bootstrap: concepts/scoring.md
+      - Robustness metrics: concepts/robustness.md
+  - User guide:
+      - Overview: guide/index.md
+      - Configuring a suite: guide/configuring-a-suite.md
+      - Adding a new model: guide/adding-a-model.md
+      - Running a benchmark: guide/running-a-benchmark.md
+      - Reading the results: guide/reading-results.md
+      - Streamlit UI: guide/ui.md
+      - Monitoring dashboard: guide/monitoring.md
+  - LLMOps:
+      - Overview: llmops/index.md
+      - Versioning and hashing: llmops/versioning.md
+      - Run manifests: llmops/manifests.md
+      - Determinism: llmops/determinism.md
+      - Scoring audit: llmops/scoring-audit.md
+      - CI pipeline: llmops/ci.md
+      - Docker and image tags: llmops/docker.md
+      - RunPod and GPU pods: llmops/runpod.md
+      - Artifacts and storage: llmops/artifacts.md
+  - API reference: reference/
+  - Studies:
+      - Published studies: studies/index.md
+  - About:
+      - Contributing: about/contributing.md
+      - Changelog: about/changelog.md
+      - License: about/license.md
+
+watch:
+  - src/parhaf_clinbench
+  - docs/_scripts/gen_ref_pages.py

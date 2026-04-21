@@ -11,36 +11,51 @@ dependencies = [
   "requests>=2.32",
   "pydantic>=2.8",
   "pydantic-settings>=2.4",
-  "accelerate>=1.0",
-  "gliner2>=0.3.1",
   "huggingface-hub>=0.24",
   "datasets>=2.21",
-  "streamlit>=1.39",
-  "streamlit-extras>=0.4",
-  "streamlit-option-menu>=0.3.12",
-  "plotly>=5.24",
   "pandas>=2.2",
   "pyarrow>=17.0",
   "numpy>=2.0",
+  "plotly>=5.24",
 ]
 
 [project.optional-dependencies]
+gliner = [
+  "gliner2>=0.3.1",
+  "accelerate>=1.0",
+]
+vllm = [
+  "vllm>=0.8.5",
+]
+ui = [
+  "streamlit>=1.39",
+  "streamlit-extras>=0.4,<0.5",
+  "streamlit-option-menu>=0.3.12",
+]
+monitoring = [
+  "rich>=13.0",
+]
 dev = [
   "pytest>=8.3",
   "pytest-cov>=5.0",
   "mypy>=1.11",
   "ruff>=0.6",
   "pre-commit>=4.5.1",
-  "pandas-stubs>=2.2.3.250308",
   "rich>=13.0",
+  "streamlit>=1.39",
+  "pandas-stubs>=2.2.3.250308",
   "types-PyYAML>=6.0.12.20240917",
   "types-requests>=2.32.0.20250328",
 ]
-locale = [
-  "vllm>=0.8.5",
-]
-monitoring = [
-  "rich>=13.0",
+docs = [
+  "mkdocs>=1.6",
+  "mkdocs-material>=9.5,<10",
+  "mkdocstrings[python]>=0.26",
+  "mkdocs-gen-files>=0.5",
+  "mkdocs-literate-nav>=0.6",
+  "mkdocs-section-index>=0.3",
+  "pymdown-extensions>=10.9",
+  "mkdocs-minify-plugin>=0.8",
 ]
 
 
@@ -76,6 +91,7 @@ testpaths = ["tests"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+incremental = false
 warn_return_any = true
 warn_unused_configs = true
 disallow_subclassing_any = true
@@ -85,10 +101,13 @@ check_untyped_defs = true
 no_implicit_optional = true
 show_error_codes = true
 pretty = true
-files = ["src", "tests", "ui", "monitoring"]
+plugins = ["pydantic.mypy"]
+files = ["src", "tests", "monitoring"]
 
 [[tool.mypy.overrides]]
 module = [
+  "matplotlib",
+  "matplotlib.*",
   "pandas",
   "plotly",
   "plotly.*",
@@ -98,12 +117,21 @@ module = [
   "streamlit",
   "streamlit.*",
 ]
+follow_imports = "skip"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["pyarrow"]
 ignore_missing_imports = true
 disable_error_code = ["import-untyped"]
+
+[[tool.mypy.overrides]]
+module = ["torch", "torch.*", "transformers", "transformers.*", "gliner2", "gliner2.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["ui", "ui.*"]
+disallow_untyped_decorators = false
 
 [tool.coverage.run]
 source = ["parhaf_clinbench", "ui", "monitoring"]

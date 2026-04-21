@@ -535,13 +535,12 @@ def render() -> None:
     st.markdown("**Benchmark codebase**")
     st.code(
         """\
-@software{mechouek2026parhafclibench,
+@software{parhaf_clibench,
   author       = {Mechouek, Lounes},
-  title        = {{PARHAF-LM-CLINBENCH}: A Reproducible Benchmark for
-                  French Clinical Information Extraction},
+  title        = {parhaf-clibench: A reproducible benchmark for clinical information extraction with language models on PARHAF},
   year         = {2026},
   url          = {https://github.com/lounesmechouek/parhaf-clibench},
-  note         = {Open-source benchmark package parhaf-clinbench}
+  version      = {0.1.0}
 }""",
         language="bibtex",
     )

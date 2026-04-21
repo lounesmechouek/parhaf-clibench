@@ -1,0 +1,13 @@
+# Analysis-only dependencies for result_analysis.ipynb and ui/.
+pandas>=2.2
+numpy>=2.0
+pyarrow>=17.0
+plotly>=5.24
+kaleido==0.2.1
+jupytext>=1.16
+ipykernel>=6.29
+nbformat>=5.10
+nbconvert>=7.16
+statsmodels>=0.14
+scikit-learn>=1.5
+tqdm>=4.66

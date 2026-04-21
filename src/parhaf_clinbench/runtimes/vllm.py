@@ -192,7 +192,7 @@ class VllmRuntime(RuntimeBackend):
             try:
                 from transformers import AutoTokenizer
 
-                self._tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
+                self._tokenizer = AutoTokenizer.from_pretrained(
                     self._model_hf_id,
                     revision=self._tokenizer_revision,
                     trust_remote_code=True,
